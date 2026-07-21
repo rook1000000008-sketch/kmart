@@ -84,20 +84,6 @@
 </head>
 <body class="min-h-screen pb-16">
 
-    <!-- ==================== 0. SETUP API KEY MODAL ==================== -->
-    <div id="api-setup-page" class="fixed inset-0 z-[150] bg-[#03120E] flex items-center justify-center p-4 hidden">
-        <div class="max-w-md w-full glass-panel rounded-3xl p-6 text-center border-2 border-[#10B981]/50 shadow-[0_0_50px_rgba(16,185,129,0.3)]">
-            <div class="w-16 h-16 mx-auto mb-4 bg-[#10B981]/20 rounded-2xl flex items-center justify-center border-2 border-[#10B981] shadow-[0_0_20px_#10B981]">
-                <i class="fa-solid fa-key text-3xl text-[#34D399]"></i>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-1">ตั้งค่าระบบครั้งแรก (อบต.ข่วงเปา)</h3>
-            <p class="text-xs text-emerald-200/70 mb-4">ระบบกำลังเปิดใช้งานด้วยรหัสสิทธิ์ส่วนกลาง อบต.</p>
-            <button onclick="saveApiKeyManually()" class="w-full neon-glow-btn text-white font-bold py-3 text-xs rounded-xl uppercase tracking-wider">
-                <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i> เข้าสู่หน้าลงชื่อเข้าใช้
-            </button>
-        </div>
-    </div>
-
     <!-- ==================== 1. LOGIN COVER PAGE ==================== -->
     <div id="login-cover-page" class="fixed inset-0 z-[100] bg-gradient-to-br from-[#020B08] via-[#07241C] to-[#010806] flex items-center justify-center p-4 overflow-y-auto">
         <div class="max-w-4xl w-full glass-panel border-2 border-emerald-500/40 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.8)] overflow-hidden grid grid-cols-1 md:grid-cols-2">
@@ -530,14 +516,14 @@
             <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-y-5 gap-x-6 text-center text-[11px] font-bold border-t pt-4 border-slate-200">
                 <div class="space-y-0.5 flex flex-col items-center">
                     <div id="stamp-box-1" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">ยังไม่ยื่นใบเบิก</div>
-                    <p>ลงชื่อ: ....................................... (ผู้เบิก)</p>
+                    <p>ลงชื่อ: ........................................................... (ผู้เบิก)</p>
                     <p class="text-[10px] text-slate-700 font-bold">( <span id="sign-name-1"></span> )</p>
                     <p class="text-[9px] text-slate-500">ตำแหน่ง: ผู้ขอเบิกพัสดุประจำกองงาน</p>
                 </div>
 
                 <div class="space-y-0.5 flex flex-col items-center">
                     <div id="stamp-box-2" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
-                    <p>ลงชื่อ: ....................................... (ผู้ตรวจสอบ)</p>
+                    <p>ลงชื่อ: ........................................................... (ผู้ตรวจสอบ)</p>
                     <p class="text-[10px] text-slate-700 font-bold">( นางสมพร ศรีวิทะ )</p>
                     <p class="text-[9px] text-slate-500">ตำแหน่ง: เจ้าหน้าที่พัสดุ</p>
                 </div>
@@ -545,7 +531,7 @@
                 <div class="space-y-0.5 flex flex-col items-center">
                     <div id="stamp-box-3" class="text-[9px] bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg px-4 py-0.5 font-black uppercase mb-0.5">3. อนุมัติจ่ายพัสดุ</div>
                     <p class="text-[10px] text-emerald-950 font-bold mb-1">ความเห็นพัสดุ: มีพัสดุในคลังเพียงพอ เห็นควรอนุมัติจ่าย</p>
-                    <p>ลงชื่อ: ....................................... (ผู้อนุมัติ)</p>
+                    <p>ลงชื่อ: ........................................................... (ผู้อนุมัติ)</p>
                     <p class="text-[10px] text-slate-900 font-extrabold">( นางอุไรวรรณ เครือฟู )</p>
                     <p class="text-[9px] text-emerald-800 font-bold">ตำแหน่ง: หัวหน้าเจ้าหน้าที่พัสดุ อบต.ข่วงเปา</p>
                 </div>
@@ -627,16 +613,8 @@
 
     <!-- ==================== 7. JAVASCRIPT ENGINE ==================== -->
     <script>
-        const ENCODED_CENTRAL_KEY = "QVEuQWI4Uk42TEVtc2hEZWFyN09WZ0F5TE9lZFhKVjhGVkNwZTY4LW1mOEk1TlI0eTB4b3c=";
-
-        function getDecodedCentralKey() {
-            try {
-                if (ENCODED_CENTRAL_KEY && !ENCODED_CENTRAL_KEY.includes("QVEuQWI4Uk42TEVtc2hEZWFyN09WZ0F5TE9lZFhKVjhGVkNwZTY4LW1mOEk1TlI0eTB4b3c=")) {
-                    return atob(ENCODED_CENTRAL_KEY);
-                }
-            } catch(e) { console.error("Key decoding error", e); }
-            return "";
-        }
+        // แทนที่ URL ด้านล่างนี้ด้วย URL ของ Cloudflare Worker ที่คุณเพิ่งสร้างขึ้น
+        const BACKEND_PROXY_URL = "https://your-worker-name.your-subdomain.workers.dev";
 
         const personnelData = {
             "organization": "องค์การบริหารส่วนตำบลข่วงเปา",
@@ -769,31 +747,6 @@
         let currentUser = {}; let currentDivName = ""; let cart = {};
         let enteredPin = ""; let approvalStatus = { 1: false, 2: false, 3: false };
         let uploadedProductImageBase64 = "";
-
-        function getSavedApiKey() {
-            return localStorage.getItem("KPL_CENTRAL_API_KEY") || getDecodedCentralKey();
-        }
-
-        function checkApiKeyRequirement() {
-            const activeKey = getSavedApiKey();
-            const setupPage = document.getElementById('api-setup-page');
-            
-            if (activeKey && activeKey.length > 10) {
-                setupPage.classList.add('hidden');
-                initCoverLogin();
-            } else {
-                setupPage.classList.remove('hidden');
-            }
-        }
-
-        function saveApiKeyManually() {
-            const decodedKey = getDecodedCentralKey();
-            if (decodedKey) {
-                localStorage.setItem("KPL_CENTRAL_API_KEY", decodedKey);
-            }
-            document.getElementById('api-setup-page').classList.add('hidden');
-            initCoverLogin();
-        }
 
         function initCoverLogin() {
             const select = document.getElementById('login-user-select'); select.innerHTML = '';
@@ -1246,36 +1199,25 @@
             messages.innerHTML += `<div id="${loadingId}" class="text-left"><span class="bg-[#07241C] border border-emerald-500/40 text-emerald-300 p-2.5 rounded-xl inline-block my-1 shadow animate-pulse">🤖 น้องกะปิ กำลังประมวลผล...</span></div>`;
             messages.scrollTop = messages.scrollHeight;
 
-            const apiKeyClean = getSavedApiKey() ? getSavedApiKey().trim() : "";
-            if (!apiKeyClean) {
-                document.getElementById(loadingId).remove();
-                messages.innerHTML += `<div class="text-left"><span class="bg-amber-950/80 border border-amber-500/50 text-amber-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> ไม่พบรหัส API Key ส่วนกลางในเครื่องนี้ กรุณารีเฟรชเพื่อตั้งค่าใหม่ครับ</span></div>`;
-                messages.scrollTop = messages.scrollHeight;
-                return;
-            }
-
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
-                const promptText = `คุณคือ "น้องกะปิ" AI ผู้ช่วยประจำสโตร์ อบต.ข่วงเปา สุภาพ น่ารัก ตอบสั้นกระชับเข้าใจง่าย\n\nคำถาม: ${query}`;
-
-                const response = await fetch(url, {
+                const response = await fetch(BACKEND_PROXY_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyClean },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: `คุณคือ "น้องกะปิ" AI ผู้ช่วยประจำสโตร์ อบต.ข่วงเปา สุภาพ น่ารัก ตอบสั้นกระชับเข้าใจง่าย\n\nคำถาม: ${query}` })
                 });
 
                 const data = await response.json();
+                document.getElementById(loadingId).remove();
+                
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     let reply = data.candidates[0].content.parts[0].text;
-                    document.getElementById(loadingId).remove();
                     messages.innerHTML += `<div class="text-left"><span class="bg-[#07241C] border border-emerald-500/40 text-emerald-100 p-2.5 rounded-xl inline-block my-1 shadow leading-relaxed">🤖 <strong>น้องกะปิ:</strong> ${reply.replace(/\n/g, '<br>')}</span></div>`;
-                } else if (data.error) {
-                    document.getElementById(loadingId).remove();
-                    messages.innerHTML += `<div class="text-left"><span class="bg-red-950/80 border border-red-500/50 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> API แจ้งข้อผิดพลาด: ${data.error.message || 'Key ไม่ได้รับการอนุมัติ'}</span></div>`;
+                } else {
+                    messages.innerHTML += `<div class="text-left"><span class="bg-red-950 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> ขออภัย เกิดข้อผิดพลาดในการประมวลผล</span></div>`;
                 }
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                messages.innerHTML += `<div class="text-left"><span class="bg-red-950/80 border border-red-500/50 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> การเชื่อมต่อล้มเหลว กรุณาเช็กอินเทอร์เน็ตครับ</span></div>`;
+                messages.innerHTML += `<div class="text-left"><span class="bg-red-950 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> การเชื่อมต่อล้มเหลว</span></div>`;
             }
             messages.scrollTop = messages.scrollHeight;
         }
@@ -1292,14 +1234,15 @@
                 const currentMaterials = getCurrentDivMaterials();
                 const itemListStr = currentMaterials.map(m => `ID: ${m.item_id}, Name: ${m.item_name}`).join("\n");
                 const promptText = `คุณคือระบบอ่านเอกสารใบส่งของ พัสดุ อบต.วิเคราะห์ภาพนี้แล้วตอบกลับเป็น JSON ดังนี้:{ "item_id": "...", "price": 0.00, "qty": 0, "lot_id": "..." }:\n${itemListStr}`;
-                const apiKeyClean = getSavedApiKey() ? getSavedApiKey().trim() : "";
 
                 try {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
-                    const response = await fetch(url, {
+                    const response = await fetch(BACKEND_PROXY_URL, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyClean },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }, { inline_data: { mime_type: mimeType, data: base64Image } }] }] })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            prompt: promptText, 
+                            inline_data: { mime_type: mimeType, data: base64Image } 
+                        })
                     });
 
                     const data = await response.json();
@@ -1313,7 +1256,9 @@
                         statusText.innerText = "✅ น้องกะปิแกะข้อมูลลงฟอร์มเรียบร้อย!";
                         alert("✨ น้องกะปิอ่านเอกสารสำเร็จ เติมข้อมูลลงฟอร์มให้อัตโนมัติแล้วครับ");
                     }
-                } catch (err) { statusText.innerText = "❌ เกิดข้อผิดพลาดในการสแกน"; }
+                } catch (err) { 
+                    statusText.innerText = "❌ เกิดข้อผิดพลาดในการสแกน"; 
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -1421,7 +1366,7 @@
             updateBudgetDisplay(); updateCartUI(); renderProducts();
         }
 
-        checkApiKeyRequirement();
+        initCoverLogin();
     </script>
 </body>
 </html>
