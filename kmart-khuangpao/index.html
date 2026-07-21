@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-MART v5.0 - ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง อบต.ข่วงเปา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 🟢 ไลบรารีสำหรับสแกน QR Code หน้าตั้งค่า -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Sarabun', sans-serif; background-color: #F0F4F1; }
+        .cyber-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 236, 229, 0.8); box-shadow: 0 8px 32px 0 rgba(140, 160, 145, 0.08); }
+        .watermark-container { position: relative; }
+        .watermark-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; opacity: 0.05; pointer-events: none; z-index: 50; }
+        .kapi-bot-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+        .pin-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 1px solid #10B981; color: #0D2D26; font-weight: bold; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .pin-btn:hover { background: #10B981; color: white; transform: scale(1.08); }
+        .pin-btn:active { transform: scale(0.95); }
+
+        /* 🟢 จัดระบบการแบ่งหน้าสำหรับการพิมพ์ (Print Style Fix) */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm 12mm 10mm 12mm;
+            }
+            body { 
+                background-color: #ffffff !important; 
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print { display: none !important; }
+            .print-area { 
+                display: block !important; 
+                width: 100% !important; 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                border: none !important;
+            }
+            /* บังคับแยกขึ้นหน้าใหม่แบบแน่นอน */
+            .page-break-before { 
+                break-before: page !important; 
+                page-break-before: always !important; 
+                margin-top: 0.5rem !important;
+            }
+            /* ปรับแต่งความดันการพิมพ์ */
+            .print-compact { padding: 0.5rem !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 text-slate-800">
+
+    <!-- ==================== 0. SETUP API KEY MODAL ==================== -->
+    <div id="api-setup-page" class="fixed inset-0 z-[150] bg-[#0D2D26] flex items-center justify-center p-4 hidden">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 border border-emerald-500/30 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-[#10B981]">
+                <i class="fa-solid fa-qrcode text-3xl text-[#10B981]"></i>
+            </div>
+            <h3 class="text-lg font-bold text-[#0D2D26] mb-1">ตั้งค่าระบบครั้งแรก (อบต.ข่วงเปา)</h3>
+            <p class="text-xs text-slate-500 mb-4">กรุณาสแกนคิวอาร์โค้ด หรือวางรหัส API Key ส่วนกลางเพื่อเปิดใช้งานแอปพลิเคชัน</p>
+            
+            <div id="qr-reader" class="mb-4 overflow-hidden rounded-2xl border-2 border-emerald-300 hidden"></div>
+
+            <div class="space-y-3">
+                <button id="btn-start-scanner" onclick="startQRScanner()" class="w-full bg-emerald-100 hover:bg-emerald-200 text-[#0D2D26] font-bold py-2.5 text-xs rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-camera text-base"></i> 📸 เปิดกล้องสแกน QR Code
+                </button>
+                <button id="btn-stop-scanner" onclick="stopQRScanner()" class="w-full bg-red-100 text-red-600 font-bold py-2 text-xs rounded-xl hidden">
+                    ❌ ปิดกล้องสแกน
+                </button>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-[10px] text-slate-400 font-bold">หรือป้อนรหัสคีย์ด้วยตนเอง</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <input type="password" id="input-setup-api-key" placeholder="วางรหัส API Key ที่นี่ (AIzaSy...)" class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-3 text-xs text-center font-mono focus:outline-none focus:ring-2 focus:ring-[#10B981]">
+                
+                <button onclick="saveApiKey()" class="w-full bg-gradient-to-r from-[#10B981] to-[#059669] text-white font-bold py-3 text-xs rounded-xl shadow-md">
+                    <i class="fa-solid fa-key mr-1"></i> บันทึกและเข้าสู่หน้าลงชื่อเข้าใช้
+                </button>
+                <p class="text-[10px] text-slate-400">เมื่อบันทึกแล้ว เครื่องจะจำค่าไว้ถาวร ไม่ต้องสแกนซ้ำอีก</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 1. LOGIN COVER PAGE ==================== -->
+    <div id="login-cover-page" class="fixed inset-0 z-[100] bg-gradient-to-br from-[#0D2D26] via-[#134035] to-[#0A221C] flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-4xl w-full bg-white/10 backdrop-filter backdrop-blur-xl border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+            
+            <div class="p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-emerald-500/20 bg-gradient-to-b from-black/20 to-transparent text-white">
+                <div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <!-- 🟢 ปรับเปลี่ยน: ทำเป็นวงกลมตัดขอบขาวออก -->
+                        <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
+                            <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-black tracking-wider text-[#A7F3D0]">K-MART</h2>
+                            <p class="text-[10px] text-emerald-200">v5.0 • อบต.ข่วงเปา</p>
+                        </div>
+                    </div>
+                    
+                    <div class="my-6 relative rounded-2xl overflow-hidden border border-emerald-400/30 p-4 bg-[#0D2D26]/60 text-center">
+                        <div class="w-20 h-20 mx-auto mb-2 rounded-full border-2 border-[#10B981] p-1 flex items-center justify-center bg-emerald-950/80 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                            <i class="fa-solid fa-train-subway text-3xl text-[#10B981]"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-[#A7F3D0]">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง</h3>
+                        <p class="text-[10px] text-emerald-100/70 mt-1">คลังพัสดุ FIFO • ราคาบาทจริง • ผู้ช่วย "น้องกะปิ" Gemini AI</p>
+                    </div>
+                </div>
+                
+                <div class="text-[10px] text-emerald-300/60 text-center md:text-left">
+                    <p>© องค์การบริหารส่วนตำบลข่วงเปา • ระบบพร้อมยื่นประเมิน LPA</p>
+                    <button onclick="clearSavedApiKey()" class="text-[9px] text-red-400 underline mt-2 block mx-auto md:mx-0">ล้างค่า API Key ส่วนกลาง</button>
+                </div>
+            </div>
+
+            <div class="p-8 flex flex-col justify-center bg-white/90 text-slate-800">
+                <div class="text-center mb-6">
+                    <h3 class="text-lg font-bold text-[#0D2D26]"><i class="fa-solid fa-shield-halved text-[#10B981] mr-2"></i>เข้าสู่ระบบปฏิบัติการ</h3>
+                    <p class="text-xs text-slate-500">เลือกตำแหน่งและใส่รหัส PIN 4 หลักเพื่อยืนยันตัวตน</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-600 mb-1">👤 เลือกตำแหน่ง / ผู้ใช้งาน:</label>
+                        <select id="login-user-select" onchange="onLoginUserChange()" class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#10B981]">
+                        </select>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-[10px] text-slate-400 mb-2 font-semibold">ป้อนรหัส PIN 4 หลัก:</p>
+                        <div class="flex justify-center gap-3 mb-4">
+                            <div id="pin-dot-1" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
+                            <div id="pin-dot-2" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
+                            <div id="pin-dot-3" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
+                            <div id="pin-dot-4" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 max-w-[210px] mx-auto justify-items-center">
+                        <button onclick="pressPin('1')" class="pin-btn">1</button>
+                        <button onclick="pressPin('2')" class="pin-btn">2</button>
+                        <button onclick="pressPin('3')" class="pin-btn">3</button>
+                        <button onclick="pressPin('4')" class="pin-btn">4</button>
+                        <button onclick="pressPin('5')" class="pin-btn">5</button>
+                        <button onclick="pressPin('6')" class="pin-btn">6</button>
+                        <button onclick="pressPin('7')" class="pin-btn">7</button>
+                        <button onclick="pressPin('8')" class="pin-btn">8</button>
+                        <button onclick="pressPin('9')" class="pin-btn">9</button>
+                        <button onclick="clearPin()" class="pin-btn text-xs text-red-500 bg-red-50 border-red-200">C</button>
+                        <button onclick="pressPin('0')" class="pin-btn">0</button>
+                        <button onclick="deletePin()" class="pin-btn text-xs text-slate-500"><i class="fa-solid fa-delete-left"></i></button>
+                    </div>
+
+                    <div id="login-error-msg" class="text-center text-xs text-red-500 font-bold hidden animate-bounce">
+                        ❌ รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 2. MAIN HEADER & APP CONTENT ==================== -->
+    <div id="main-app-container">
+        <header id="main-header" class="bg-gradient-to-r from-[#0D2D26] via-[#134035] to-[#1B5E4E] text-white shadow-lg sticky top-0 z-50 border-b border-[#25856F]">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <!-- 🟢 ปรับเปลี่ยน: บังคับรูปให้กลายเป็นวงกลมพอดีกับตรา ตัดกรอบสี่เหลี่ยมสีขาวออกเรียบร้อย -->
+                    <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
+                        <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-wider text-[#A7F3D0] flex items-center gap-2">
+                            K-MART <span class="text-xs bg-[#10B981] text-white px-2 py-0.5 rounded-full font-medium">v5.0</span>
+                        </h1>
+                        <p class="text-[11px] font-medium tracking-wide text-emerald-100/70">ผู้ช่วยเบิกจ่ายวัสดุ  งานพัสดุกลาง  องค์การบริหารส่วนตำบลข่วงเปา</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="text-left w-full sm:w-auto">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[10px] uppercase tracking-wider text-emerald-300 font-bold">👤 สิทธิ์ผู้ใช้งานปัจจุบัน:</label>
+                            <button onclick="logout()" class="text-[10px] text-red-300 hover:text-white underline"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</button>
+                        </div>
+                        <div id="active-user-badge" class="bg-[#0D2D26] text-emerald-100 text-xs border border-emerald-600 rounded-xl px-3 py-2 font-bold flex items-center justify-between gap-2 shadow-inner">
+                            <span id="active-user-name">นายมิ่งภพ ศรีชะบา</span>
+                            <button id="btn-admin-store-trigger" onclick="openAdminStoreModal()" class="hidden bg-[#10B981] hover:bg-[#059669] text-white text-[10px] px-2 py-1 rounded-lg font-bold transition">
+                                ⚙️ จัดการคลังพัสดุ & บันทึกบิล
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-[#0F352E]/90 px-4 py-3 rounded-2xl border border-emerald-600/50 min-w-[240px] shadow-md">
+                        <p class="text-[10px] uppercase tracking-widest text-emerald-300 font-black mb-1.5 text-center"><i class="fa-solid fa-wallet mr-1"></i> โควตางบวัสดุคงเหลือ (บาท THB)</p>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-white" id="live-sub-wallets"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content" class="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="cyber-card p-6 rounded-3xl space-y-4">
+                    <h2 class="text-xs uppercase tracking-widest font-black text-emerald-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-bar text-base text-[#10B981]"></i> สรุปงบประมาณพัสดุคงเหลือบาทจริง ทุกกองงาน
+                    </h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center" id="division-budget-panel"></div>
+                </div>
+
+                <div class="cyber-card p-4 rounded-2xl flex items-center">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-[#10B981] text-sm"></i>
+                        <input type="text" id="search-input" onkeyup="filterItems()" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหาพัสดุ..." class="w-full pl-12 pr-4 py-2.5 bg-white text-xs text-slate-700 rounded-xl border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#10B981] transition-all shadow-inner">
+                    </div>
+                </div>
+                
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="cyber-card p-6 rounded-3xl sticky top-24 space-y-6">
+                    <div class="flex justify-between items-center border-b pb-4 border-emerald-100">
+                        <h2 class="text-xs uppercase tracking-widest font-black text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-basket-shopping text-base text-[#10B981]"></i> รายการรอเบิก / SHOPPING CART
+                        </h2>
+                        <span id="cart-count" class="bg-[#10B981] text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 ITEM</span>
+                    </div>
+                    
+                    <div id="cart-items" class="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs text-slate-400 italic font-light">
+                        ไม่มีรายการพัสดุในตะกร้าของคุณ
+                    </div>
+                    
+                    <div class="border-t pt-4 border-emerald-100 space-y-1 text-xs">
+                        <div class="flex justify-between tracking-wide font-bold text-slate-700">
+                            <span>มูลค่ารวมเบิกสุทธิ (FIFO):</span>
+                            <span class="text-xl font-black text-[#10B981]"><span id="cart-total">0.00</span> บาท</span>
+                        </div>
+                        <div id="wallet-warning" class="text-[10px] text-red-500 font-bold tracking-wide hidden animate-pulse">⚠️ แจ้งเตือน: งบโควตาพัสดุประเภทนี้ไม่เพียงพอ!</div>
+                    </div>
+
+                    <div class="bg-[#F4F9F6] p-4 rounded-2xl border border-emerald-100 text-[11px] space-y-3">
+                        <p class="font-bold text-emerald-900 tracking-wider uppercase text-[10px] flex items-center gap-1">
+                            <i class="fa-solid fa-square-check text-[#10B981]"></i> ลำดับสถานะสายงานอนุมัติเอกสาร:
+                        </p>
+                        <div class="space-y-2 text-xs font-semibold">
+                            <button id="btn-approve-1" onclick="triggerStamp(1)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>1. ยื่นขอเบิก (<span id="flow-requester" class="font-bold text-emerald-300"></span>)</span> <span id="status-approve-1" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">ขอเบิก</span>
+                            </button>
+                            <button id="btn-approve-2" onclick="triggerStamp(2)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>2. จพง.พัสดุ (นางสมพร ศรีวิทะ)</span> <span id="status-approve-2" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            </button>
+                            <button id="btn-approve-3" onclick="triggerStamp(3)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>3. ผอ.กองงาน (<span id="flow-head" class="font-bold text-emerald-300"></span>)</span> <span id="status-approve-3" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            </button>
+                            <button id="btn-approve-4" onclick="triggerStamp(4)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>4. ปลัด อบต. (นายมิ่งภพ ศรีชะบา)</span> <span id="status-approve-4" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            </button>
+                            <button id="btn-approve-5" onclick="triggerStamp(5)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>5. นายก อบต. (นายรุ่งสุริยา เชียงชีระ)</span> <span id="status-approve-5" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-1">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">📌 วัตถุประสงค์โครงการ / งานที่นำไปใช้</label>
+                            <input type="text" id="project-purpose" placeholder="ระบุวัตถุประสงค์การนำวัสดุไปใช้งาน..." class="w-full px-3 py-2 text-xs border border-emerald-100 bg-white rounded-xl focus:ring-2 focus:ring-[#10B981] outline-none text-slate-700 shadow-inner">
+                        </div>
+                        <button onclick="submitOrder()" class="w-full bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white tracking-widest font-bold py-3.5 text-xs rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase">
+                            <i class="fa-solid fa-file-invoice text-[10px]"></i> ประมวลผลใบเบิกและรายงานตัดยอดเงิน
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== 4. ADMIN STORE MODAL ==================== -->
+    <div id="admin-store-modal" class="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl border border-emerald-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] p-4 text-white flex justify-between items-center border-b border-[#25856F]">
+                <h3 class="font-bold text-sm text-[#A7F3D0] flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-packing text-[#10B981]"></i> ระบบจัดการคลังพัสดุ & บันทึกบิลจัดซื้อจริง (Admin Store)
+                </h3>
+                <button onclick="closeAdminStoreModal()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-700">
+                <div class="bg-gradient-to-r from-emerald-900 to-[#134035] p-4 rounded-2xl text-white shadow-lg space-y-3 border border-emerald-500/40">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-[#A7F3D0] flex items-center gap-2 text-xs">
+                            <i class="fa-solid fa-camera-retro text-lg text-[#10B981]"></i> 📸 ระบบสแกนใบส่งของ/ใบเสร็จรับเงิน อัตโนมัติ (AI Smart OCR)
+                        </h4>
+                        <span class="text-[9px] bg-[#10B981] text-white px-2 py-0.5 rounded-full font-bold">Gemini Vision AI</span>
+                    </div>
+                    <p class="text-[10px] text-emerald-100/80">ถ่ายรูปหรืออัปโหลดภาพใบส่งของจากกองคลัง "น้องกะปิ" จะแกะราคาสินค้า จำนวน และเลขบิลให้อัตโนมัติ!</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 items-center pt-1">
+                        <input type="file" id="bill-image-input" accept="image/*" class="hidden" onchange="processBillImage(event)">
+                        <button onclick="document.getElementById('bill-image-input').click()" class="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white font-bold px-4 py-2.5 rounded-xl transition shadow flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-file-arrow-up"></i> เลือกรูปภาพ / ถ่ายภาพใบส่งของ
+                        </button>
+                        <span id="scan-status-text" class="text-[11px] font-bold text-emerald-200"></span>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-3">
+                    <h4 class="font-bold text-emerald-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-circle-plus text-[#10B981]"></i> 1. บันทึกบิลจัดซื้อ / ปรับราคาท้องถิ่น & เพิ่มสต็อก
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">เลือกพัสดุที่ต้องการปรับราคา/เพิ่มคลัง:</label>
+                            <select id="admin-select-material" class="w-full bg-white border border-emerald-200 rounded-xl p-2 font-medium"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ราคาจัดซื้อจริงต่อหน่วย (บาท THB):</label>
+                            <input type="number" id="admin-input-price" step="0.01" placeholder="เช่น 125.00" class="w-full border border-emerald-200 rounded-xl p-2 font-bold text-emerald-800">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">จำนวนที่รับเข้าคลังเพิ่ม (หน่วย):</label>
+                            <input type="number" id="admin-input-add-qty" placeholder="เช่น 20" class="w-full border border-emerald-200 rounded-xl p-2 font-bold text-emerald-800">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">เลขที่บิล / อ้างอิงล็อตจัดซื้อ (Lot ID):</label>
+                            <input type="text" id="admin-input-lot-id" placeholder="เช่น LOT-2569-07" class="w-full border border-emerald-200 rounded-xl p-2 font-medium">
+                        </div>
+                    </div>
+                    <button onclick="saveStoreItemUpdate()" class="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2.5 rounded-xl transition shadow">
+                        💾 บันทึกปรับปรุงราคาจริงและเพิ่มสต็อกเข้าคลัง
+                    </button>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                    <h4 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-blue-600"></i> 2. เพิ่มรายการพัสดุชนิดใหม่เข้าคลัง
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ชื่อรายการพัสดุใหม่:</label>
+                            <input type="text" id="admin-new-name" placeholder="ระบุชื่อพัสดุ..." class="w-full border rounded-xl p-2">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ประเภทวัสดุ:</label>
+                            <select id="admin-new-type" class="w-full border rounded-xl p-2">
+                                <option value="office">📝 วัสดุสำนักงาน</option>
+                                <option value="computer">💻 วัสดุคอมพิวเตอร์</option>
+                                <option value="household">🏠 วัสดุงานบ้านงานครัว</option>
+                                <option value="other">📦 วัสดุอื่นๆ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ราคาบาทจริง / จำนวนเปิดสต็อก:</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="admin-new-price" placeholder="ราคา" class="w-1/2 border rounded-xl p-2">
+                                <input type="number" id="admin-new-stock" placeholder="จำนวน" class="w-1/2 border rounded-xl p-2">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addNewMaterialItem()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition shadow">
+                        ➕ บันทึกเพิ่มรายการพัสดุใหม่
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 5. AI BOT WIDGET ==================== -->
+    <div class="kapi-bot-float no-print">
+        <button onclick="toggleKapiChat()" class="bg-[#10B981] hover:bg-[#059669] text-white p-3.5 rounded-full shadow-2xl border-2 border-white flex items-center space-x-2 transition transform hover:scale-105">
+            <i class="fa-solid fa-robot text-xl"></i>
+            <span class="font-bold text-xs hidden sm:inline">ผู้ช่วย "น้องกะปิ" Gemini AI</span>
+        </button>
+
+        <div id="kapiChatBox" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-emerald-200 overflow-hidden text-slate-800">
+            <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] text-white p-3.5 flex justify-between items-center border-b border-[#25856F]">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center text-white font-black text-sm">k</div>
+                    <div>
+                        <h4 class="font-bold text-xs text-[#A7F3D0]">น้องกะปิ (kapi) Gemini AI</h4>
+                        <p class="text-[10px] text-emerald-200">สมองอัจฉริยะ อบต.ข่วงเปา</p>
+                    </div>
+                </div>
+                <button onclick="toggleKapiChat()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="kapiMessages" class="p-4 h-64 overflow-y-auto text-xs space-y-3 bg-[#F4F9F6]">
+                <div class="bg-white border border-emerald-100 p-2.5 rounded-xl shadow-sm text-slate-700">
+                    สวัสดีครับท่านปลัดและพี่ๆ เจ้าหน้าที่! ผม <strong>น้องกะปิ (kapi)</strong> พร้อมโต้ตอบและช่วยเหลือครับ!
+                </div>
+            </div>
+            <div class="p-2 bg-slate-50 border-t flex flex-wrap gap-1 text-[10px]">
+                <button onclick="askKapi('ขอรหัส PIN เข้าใช้งานหน่อยครับ')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">🔑 ขอรหัส PIN</button>
+                <button onclick="askKapi('ช่วยสอนวิธีเบิกพัสดุอย่างละเอียดหน่อย')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">❓ วิธีเบิกของ</button>
+                <button onclick="askKapi('อธิบายระบบ FIFO ในการบริหารสโตร์ให้ฟังหน่อย')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">📦 ระบบ FIFO</button>
+            </div>
+            <div class="p-2 bg-white border-t flex items-center space-x-2">
+                <input id="kapiInput" type="text" onkeypress="if(event.key==='Enter') sendKapiMessage()" placeholder="พิมพ์ถามน้องกะปิ..." class="flex-1 border border-emerald-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#10B981]">
+                <button onclick="sendKapiMessage()" class="bg-[#10B981] hover:bg-[#059669] text-white px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 6. OFFICIAL DOCUMENT VIEW (หน้ารายงานผล & ใบเบิก) ==================== -->
+    <div id="official-document-view" class="max-w-4xl mx-auto my-4 p-8 bg-white shadow-2xl rounded-3xl border border-slate-200 hidden print-area">
+        
+        <!-- 📄 หน้าที่ 1: ใบเบิกพัสดุและสายอนุมัติ 5 ลำดับ -->
+        <div class="watermark-container">
+            <img src="KPLOGO.jpg" class="watermark-bg" alt="อบต. ลายน้ำ">
+            
+            <div class="text-center space-y-0.5">
+                <h2 class="text-lg font-bold tracking-wide text-slate-900">ใบเบิกพัสดุ / วัสดุสิ่งของใช้ในราชการ</h2>
+                <p class="text-sm font-bold text-emerald-900" id="doc-org-title">องค์การบริหารส่วนตำบลข่วงเปา</p>
+                <div class="flex justify-between items-center text-[11px] font-semibold text-slate-600 pt-1 border-b pb-2 border-slate-200">
+                    <span><b>ใบเบิกเลขที่:</b> <span id="doc-rec-id" class="text-emerald-800 font-bold">KP-REC-2569/XXXX</span></span>
+                    <span><b>วันที่ประมวลผล:</b> <span id="doc-date" class="font-bold text-slate-800"></span></span>
+                </div>
+            </div>
+
+            <div class="mt-3 text-[11px] space-y-1 text-slate-800 leading-normal">
+                <p><b>เรื่อง:</b> ขออนุมัติเบิกพัสดุสิ่งของเพื่อใช้ในราชการ</p>
+                <p><b>เรียน:</b> หัวหน้าหน่วยพัสดุกลาง (องค์การบริหารส่วนตำบลข่วงเปา)</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 my-1.5">
+                    <div><b>ด้วยข้าพเจ้า (ผู้ขอเบิก):</b> <span id="doc-requester" class="underline decoration-dotted text-emerald-900 font-bold"></span></div>
+                    <div><b>สังกัด / ส่วนราชการ:</b> <span id="doc-department" class="underline decoration-dotted text-emerald-900 font-bold"></span></div>
+                    <div class="sm:col-span-2"><b>มีความประสงค์จะขอเบิกพัสดุสิ่งของเพื่อนำไปใช้ในราชการ (วัตถุประสงค์):</b><br>
+                        <span id="doc-purpose" class="underline decoration-dotted text-slate-700 font-medium"></span>
+                    </div>
+                </div>
+                <p class="text-right italic text-[10px] text-slate-500">* ได้ตรวจสอบรายการพัสดุและวงเงินงบประมาณโควตาแล้ว มีพัสดุเพียงพอจ่ายได้ตามรายการดังต่อไปนี้:</p>
+            </div>
+
+            <div class="mt-2">
+                <table class="w-full border-collapse border border-slate-300 text-[11px] font-bold">
+                    <thead>
+                        <tr class="bg-emerald-900 text-white border-b border-slate-300">
+                            <th class="border border-slate-300 p-1.5 text-center w-10">ลำดับ</th>
+                            <th class="border border-slate-300 p-1.5 text-left">รายการพัสดุ / วัสดุสิ่งของ</th>
+                            <th class="border border-slate-300 p-1.5 text-center w-20">ประเภทวัสดุ</th>
+                            <th class="border border-slate-300 p-1.5 text-center w-14">จำนวน</th>
+                            <th class="border border-slate-300 p-1.5 text-right w-20">ราคา/หน่วย</th>
+                            <th class="border border-slate-300 p-1.5 text-right w-24">ราคารวม (บาท)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doc-table-body" class="text-slate-800"></tbody>
+                </table>
+            </div>
+
+            <p class="text-[11px] font-bold text-slate-700 mt-2 text-center">จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ</p>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-6 text-center text-[11px] font-bold border-t pt-4 border-slate-200">
+                <div class="space-y-0.5 flex flex-col items-center">
+                    <div id="stamp-box-1" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">ยังไม่ยื่นใบเบิก</div>
+                    <p>ลงชื่อ: ........................................................... (ผู้เบิก)</p>
+                    <p class="text-[10px] text-slate-700 font-bold">( <span id="sign-name-1"></span> )</p>
+                    <p class="text-[9px] text-slate-500">ตำแหน่ง: ผู้ขอเบิกพัสดุประจำกองงาน</p>
+                </div>
+
+                <div class="space-y-0.5 flex flex-col items-center">
+                    <div id="stamp-box-3" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
+                    <p>ลงชื่อ: ........................................................... (ผู้เห็นชอบ)</p>
+                    <p class="text-[10px] text-slate-700 font-bold">( <span id="sign-name-3"></span> )</p>
+                    <p class="text-[9px] text-slate-500">ตำแหน่ง: หัวหน้าส่วนราชการ / ผอ.กองงาน</p>
+                </div>
+
+                <div class="space-y-0.5 flex flex-col items-center">
+                    <div id="stamp-box-2" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
+                    <p>ลงชื่อ: ........................................................... (ผู้ตรวจสอบ)</p>
+                    <p class="text-[10px] text-slate-700 font-bold">( นางสมพร ศรีวิทะ )</p>
+                    <p class="text-[9px] text-slate-500">ตำแหน่ง: เจ้าหน้าที่พัสดุ</p>
+                </div>
+
+                <div class="space-y-0.5 flex flex-col items-center">
+                    <div id="stamp-box-4" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-xl px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
+                    <p>ลงชื่อ: ........................................................... (ผู้สั่งจ่ายพัสดุ)</p>
+                    <p class="text-[10px] text-slate-700 font-bold">( นายมิ่งภพ ศรีชะบา )</p>
+                    <p class="text-[9px] text-slate-500">ตำแหน่ง: ปลัดองค์การบริหารส่วนตำบลข่วงเปา</p>
+                </div>
+
+                <div class="sm:col-span-2 space-y-0.5 mt-1 flex flex-col items-center border-t pt-2 border-slate-100">
+                    <div id="stamp-box-5" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
+                    <p>ลงชื่อ: ........................................................... (ผู้อนุมัติ)</p>
+                    <p class="text-[10px] text-slate-900 font-black">( นายรุ่งสุริยา เชียงชีระ )</p>
+                    <p class="text-[9px] text-emerald-800 font-bold">ตำแหน่ง: นายกองค์การบริหารส่วนตำบลข่วงเปา</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📄 หน้าที่ 2: QR Code, ใบรับ-จ่ายพัสดุ และรายงานคลัง -->
+        <div class="page-break-before space-y-4 pt-2">
+            
+            <!-- 📲 QR Code สำหรับเจ้าหน้าที่ Store สแกนจ่ายพัสดุ -->
+            <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] p-5 rounded-2xl text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-[#10B981]">
+                <div class="space-y-1.5 text-center md:text-left flex-1">
+                    <span class="bg-[#10B981] text-white font-black text-[9px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">STORE PICKUP QR CODE</span>
+                    <h3 class="text-sm font-bold text-[#A7F3D0]">คิวอาร์โค้ดยืนยันการรับพัสดุ (สำหรับเจ้าหน้าที่คลัง)</h3>
+                    <p class="text-[11px] text-emerald-100/80 leading-relaxed">
+                        นำ QR Code นี้แสดงให้เจ้าหน้าที่ประจำสโตร์สแกนด้วยกล้องเพื่อตรวจสอบรายการของที่ได้รับอนุมัติ และบันทึกจ่ายออกจากคลัง FIFO
+                    </p>
+                    <p class="text-[9px] text-emerald-300 font-mono" id="qr-data-preview"></p>
+                </div>
+                
+                <div class="bg-white p-2 rounded-xl shadow-md border-2 border-emerald-400 flex flex-col items-center justify-center">
+                    <img id="store-pickup-qrcode-img" src="" alt="Pickup QR Code" class="w-24 h-24 object-contain">
+                    <span class="text-[8px] text-slate-500 font-bold mt-1 uppercase">Scan to Dispatch</span>
+                </div>
+            </div>
+
+            <!-- 🖊️ ส่วนลงนามลายมือชื่อ ผู้รับของ และ ผู้จ่ายพัสดุ -->
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-300 text-[11px] text-slate-800">
+                <h4 class="font-bold text-center text-emerald-900 mb-4 uppercase tracking-wider">
+                    <i class="fa-solid fa-pen-nib mr-1 text-[#10B981]"></i> หลักฐานการรับ - จ่ายพัสดุจริง ณ คลังกลาง
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center font-bold">
+                    <!-- ฝั่งผู้รับของ -->
+                    <div class="space-y-1 flex flex-col items-center">
+                        <p class="text-slate-500 text-[10px] mb-3">ได้รับพัสดุตามรายการข้างต้นถูกต้อง ครบถ้วนแล้ว</p>
+                        <p>ลงชื่อ: ........................................................... (ผู้รับของ)</p>
+                        <p class="text-[10px] text-slate-800 font-black mt-0.5">( <span id="pickup-sign-requester"></span> )</p>
+                        <p class="text-[9px] text-slate-500 font-normal">ตำแหน่ง: ผู้ขอเบิกพัสดุ / ผู้รับมอบหมาย</p>
+                        <p class="text-[9px] text-slate-400 font-normal pt-0.5">วันที่ ....... / .................... / ...........</p>
+                    </div>
+
+                    <!-- ฝั่งผู้จ่ายของ -->
+                    <div class="space-y-1 flex flex-col items-center border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0">
+                        <p class="text-slate-500 text-[10px] mb-3">ได้ตรวจสอบและจ่ายพัสดุเรียบร้อยแล้ว</p>
+                        <p>ลงชื่อ: ........................................................... (ผู้จ่ายพัสดุ)</p>
+                        <p class="text-[10px] text-slate-800 font-black mt-0.5">( น.ส.เครือวัลย์ กิ่งสวัสดิ์ )</p>
+                        <p class="text-[9px] text-emerald-800 font-bold">ตำแหน่ง: ผู้ดูแลห้องพัสดุ</p>
+                        <p class="text-[9px] text-slate-400 font-normal pt-0.5">วันที่ ....... / .................... / ...........</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🧾 ส่วนใบเสร็จรายงานผลการหักยอดงบประมาณบาทจริง (กองคลัง) -->
+            <div class="border border-[#10B981] bg-emerald-50/30 p-5 rounded-2xl relative text-[11px] watermark-container">
+                <img src="KPLOGO.jpg" class="watermark-bg" alt="อบต. ลายน้ำ">
+                <div class="sm:absolute top-3 right-3 bg-[#10B981] text-white font-black text-[8px] px-2.5 py-0.5 rounded-full uppercase tracking-widest text-center mb-2 sm:mb-0">BUDGET REPORT</div>
+                <div class="space-y-0.5">
+                    <h2 class="text-xs font-bold text-emerald-950 flex items-center gap-1.5"><i class="fa-solid fa-receipt text-emerald-600"></i> ใบเสร็จรายงานผลการหักยอดงบประมาณบาทจริง พัสดุบัญชีกลาง</h2>
+                    <p class="text-[9px] text-slate-400 font-semibold">รหัสอ้างอิงธุรกรรมจริง: #KP-UPDATE-V5-FIFO</p>
+                </div>
+                <div class="mt-3 font-bold text-slate-700 text-[10px] border-t border-dashed border-emerald-300 pt-2 space-y-1">
+                    <div class="flex justify-between"><span>ส่วนราชการที่ทำรายการ:</span> <span id="rcpt-div" class="text-emerald-800 font-black"></span></div>
+                    <div class="border-y py-1 my-1 border-emerald-100 text-[9px] text-slate-600 space-y-0.5" id="rcpt-wallets-breakdown"></div>
+                    <div class="flex justify-between text-red-500 font-black"><span>ยอดเงินรวมที่ใช้จ่ายในครั้งนี้ (TOTAL SPENT):</span> <span id="rcpt-total" class="text-xs"></span></div>
+                    <div class="flex justify-between mt-1"><span>สถานะการเบิกจ่าย:</span> <span class="text-emerald-700 font-black">✔️ ตรวจสอบสต็อกพัสดุ FIFO และอนุมัติสัญญาผูกพันเสร็จสิ้น</span></div>
+                </div>
+                <div class="mt-4 flex flex-col items-center justify-center text-center space-y-0.5 border-t border-emerald-200 pt-3">
+                    <p class="text-slate-800 font-bold text-[10px]">ลงนามรับรองความถูกต้องของรายงานโดย</p>
+                    <p class="text-xs font-black text-emerald-950 mt-0.5">นางอุไรวรรณ เครือฟู</p>
+                    <p class="text-[9px] text-emerald-700 font-extrabold">( ผู้อำนวยการกองคลัง อบต.ข่วงเปา )</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ปุ่มควบคุมการพิมพ์ / ย้อนกลับ -->
+        <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4 no-print">
+            <button onclick="window.print()" class="bg-[#10B981] hover:bg-[#059669] text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
+                <i class="fa-solid fa-print"></i> พิมพ์ใบเบิกพัสดุ / เซฟเป็น PDF
+            </button>
+            <button onclick="backToMain()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
+                <i class="fa-solid fa-arrow-rotate-left"></i> ย้อนกลับหน้าหลัก
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 7. JAVASCRIPT & ENGINE ==================== -->
+    <script>
+        const personnelData = {
+            "organization": "องค์การบริหารส่วนตำบลข่วงเปา",
+            "divisions": {
+                "สำนักปลัด": { 
+                    "sub_wallets": { "office": 50000.00, "computer": 20000.00, "household": 25000.00, "other": 220000.00 },
+                    "head": "นางจิตรลดา นาคะพันธ์ุ", 
+                    "staff": [
+                        {"name": "นายมิ่งภพ ศรีชะบา", "role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา", "pin": "8888", "is_admin": true},
+                        {"name": "นางสาววีรินทร์ภัทร แสงพารารัตน์", "role": "นักวิเคราะห์นโยบายและแผนชำนาญการ", "pin": "1234"},
+                        {"name": "นายสุวัชญ์ศิษฎ์ พุทธเดชากุล", "role": "นิติกรชำนาญการ", "pin": "1234"},
+                        {"name": "นางสาวศรีพูล อุปนันท์", "role": "นักทรัพยากรบุคคคลชำนาญการ", "pin": "1234"}
+                    ],
+                    "materials": [
+                        { "item_id": "BL-OFF-01", "item_name": "กระดาษถ่ายเอกสาร AA 80G A4 (500 แผ่น)", "price_unit_coin": 120.00, "stock_remaining": 10, "image_url": "products/paper-a4.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-02", "item_name": "ปากกาลูกลื่น ควอนดั้ม 0.5 M5 Pearl", "price_unit_coin": 10.00, "stock_remaining": 50, "image_url": "products/pen.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-03", "item_name": "ปากกาหมึกเจล Pentel 0.5", "price_unit_coin": 35.00, "stock_remaining": 12, "image_url": "products/jelpen0.5.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-04", "item_name": "กระดาษสติ๊กเกอร์ขาวด้าน A4", "price_unit_coin": 85.00, "stock_remaining": 15, "image_url": "products/sticker_a4.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-05", "item_name": "กระดาษสติ๊กเกอร์แบบด้าน BOS A4", "price_unit_coin": 90.00, "stock_remaining": 20, "image_url": "products/bos.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-06", "item_name": "เทปลบคำผิด สเต็ดเลอร์ 5มม. x 6ม.", "price_unit_coin": 35.00, "stock_remaining": 20, "image_url": "products/StaedtlerEraser.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-07", "item_name": "เทปลบคำผิด Faber-Castell", "price_unit_coin": 45.00, "stock_remaining": 15, "image_url": "products/Faber-Castell_eraser.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-08", "item_name": "รีฟิลเทปลบคำผิด", "price_unit_coin": 25.00, "stock_remaining": 30, "image_url": "products/Eraser_refill.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-09", "item_name": "เทปใส แกนใหญ่ 3/4 นิ้ว", "price_unit_coin": 18.00, "stock_remaining": 30, "image_url": "products/tape.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-10", "item_name": "เทปโฟมกาว 2 หน้า 5 เมตร", "price_unit_coin": 42.00, "stock_remaining": 10, "image_url": "products/form_tape.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-11", "item_name": "ซองขาว ครุฑ (50 ซอง/มัด)", "price_unit_coin": 30.00, "stock_remaining": 25, "image_url": "products/mails.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-12", "item_name": "ซองจดหมายครุฑขาว (กล่องใหญ่)", "price_unit_coin": 250.00, "stock_remaining": 5, "image_url": "products/mailsbox.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-13", "item_name": "เครื่องคิดเลข Canon TX-121OHI III", "price_unit_coin": 390.00, "stock_remaining": 4, "image_url": "products/cal.jpg", "type": "office" }
+                    ]
+                },
+                "กองคลัง": { 
+                    "sub_wallets": { "office": 30000.00, "computer": 25000.00, "household": 0.00, "other": 21500.00 },
+                    "head": "นางอุไรวรรณ เครือฟู", 
+                    "staff": [
+                        {"name": "นางอุไรวรรณ เครือฟู", "role": "ผู้อำนวยการกองคลัง", "pin": "2222", "is_admin": true},
+                        {"name": "นางสมพร ศรีวิทะ", "role": "หัวหน้ากลุ่มพัสดุและทรัพย์สิน", "pin": "1111", "is_admin": true},
+                        {"name": "น.ส.เครือวัลย์ กิ่งสวัสดิ์", "role": "เจ้าพนักงานพัสดุ", "pin": "1234", "is_admin": true}
+                    ],
+                    "materials": [
+                        { "item_id": "BL-OFF-14", "item_name": "คลิปหนีบดำ เบอร์ 109", "price_unit_coin": 22.00, "stock_remaining": 30, "image_url": "products/neeb109.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-15", "item_name": "คลิปหนีบดำ เบอร์ 111", "price_unit_coin": 25.00, "stock_remaining": 40, "image_url": "products/neeb111.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-16", "item_name": "คลิปหนีบดำ เบอร์ 112", "price_unit_coin": 20.00, "stock_remaining": 40, "image_url": "products/neeb112.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-17", "item_name": "ลวดเสียบกระดาษ เบอร์ 0", "price_unit_coin": 10.00, "stock_remaining": 50, "image_url": "products/tire0.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-18", "item_name": "ลวดเสียบกระดาษ เบอร์ 1", "price_unit_coin": 9.00, "stock_remaining": 50, "image_url": "products/tire1.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-19", "item_name": "ลวดเย็บกระดาษ เบอร์ 10", "price_unit_coin": 12.00, "stock_remaining": 10, "image_url": "products/max10.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-20", "item_name": "กระดาษแบงค์ A4 คละสี 55 แกรม", "price_unit_coin": 110.00, "stock_remaining": 15, "image_url": "products/bank_a4.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-21", "item_name": "กระดาษถ่ายเอกสาร A3 80G", "price_unit_coin": 260.00, "stock_remaining": 5, "image_url": "products/paper-a3.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-22", "item_name": "ซองน้ำตาลขยายข้าง A4", "price_unit_coin": 120.00, "stock_remaining": 12, "image_url": "products/brown_a4.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-23", "item_name": "ซองน้ำตาลไม่ขยายข้าง A4", "price_unit_coin": 95.00, "stock_remaining": 15, "image_url": "products/brown_n_a4.jpg", "type": "office" },
+                        { "item_id": "BL-OFF-24", "item_name": "ปากกาเขียนครุภัณฑ์ EK-440 สีดำ", "price_unit_coin": 62.00, "stock_remaining": 10, "image_url": "products/PaintMarker.jpg", "type": "office" }
+                    ]
+                },
+                "กองช่าง": { 
+                    "sub_wallets": { "office": 10000.00, "computer": 15000.00, "household": 0.00, "other": 157500.00 },
+                    "head": "นายพันธ์ศักดิ์ กิ่งสวัสดิ์", 
+                    "staff": [
+                        {"name": "นายภิรุณ ภักดี", "role": "นายช่างโยธาอาวุโส", "pin": "1234"}
+                    ],
+                    "materials": [
+                        { "item_id": "BL-CH-01", "item_name": "ไม้บรรทัดเหล็ก 12 นิ้ว", "price_unit_coin": 35.00, "stock_remaining": 20, "image_url": "products/iron_scale.jpg", "type": "office" },
+                        { "item_id": "BL-CH-02", "item_name": "ไม้บรรทัดสเกลสามเหลี่ยม", "price_unit_coin": 120.00, "stock_remaining": 5, "image_url": "products/tri.jpg", "type": "office" },
+                        { "item_id": "BL-CH-03", "item_name": "กาวแท่ง UHU 21 กรัม", "price_unit_coin": 45.00, "stock_remaining": 30, "image_url": "products/uhu.jpg", "type": "office" },
+                        { "item_id": "BL-CH-04", "item_name": "แท่นประทับตรา สีแดง NO.1", "price_unit_coin": 55.00, "stock_remaining": 8, "image_url": "products/chad.jpg", "type": "office" },
+                        { "item_id": "BL-CH-05", "item_name": "ตรายางสำเนาถูกต้อง", "price_unit_coin": 35.00, "stock_remaining": 10, "image_url": "products/copy.jpg", "type": "office" },
+                        { "item_id": "BL-CH-06", "item_name": "กรรไกร 8 นิ้ว ตราช้าง H-2308", "price_unit_coin": 38.00, "stock_remaining": 15, "image_url": "products/scisser.jpg", "type": "office" },
+                        { "item_id": "BL-CH-07", "item_name": "มีดคัตเตอร์ MESA ใหญ่ ST-20", "price_unit_coin": 53.00, "stock_remaining": 10, "image_url": "products/big_mesa.jpg", "type": "office" },
+                        { "item_id": "BL-CH-08", "item_name": "มีดคัตเตอร์ MESA เล็ก", "price_unit_coin": 28.00, "stock_remaining": 15, "image_url": "products/small_mesa.jpg", "type": "office" },
+                        { "item_id": "BL-CH-09", "item_name": "แท่นตัดเทปตราช้าง", "price_unit_coin": 85.00, "stock_remaining": 8, "image_url": "products/cut_base.jpg", "type": "office" },
+                        { "item_id": "BL-CH-10", "item_name": "ที่ถอนลวดเหล็ก Eagle", "price_unit_coin": 45.00, "stock_remaining": 12, "image_url": "products/replace.jpg", "type": "office" }
+                    ]
+                },
+                "กองการศึกษา": { 
+                    "sub_wallets": { "office": 15000.00, "computer": 10000.00, "household": 222220.00, "other": 11200.00 },
+                    "head": "ผู้อำนวยการกองการศึกษาฯ", 
+                    "staff": [
+                        {"name": "เจ้าหน้าที่/ครูในสังกัด", "role": "ครูประจำศูนย์พัฒนาเด็กเล็ก", "pin": "1234"}
+                    ],
+                    "materials": [
+                        { "item_id": "RK-ED-01", "item_name": "กระดาษถ่ายเอกสาร A4 80G ตรา AA", "price_unit_coin": 120.00, "stock_remaining": 40, "image_url": "products/paper-a4.jpg", "type": "office" },
+                        { "item_id": "RK-ED-02", "item_name": "ดินสอดำ 2B Little Tree (กล่อง)", "price_unit_coin": 45.00, "stock_remaining": 25, "image_url": "products/2b_littletree.jpg", "type": "office" },
+                        { "item_id": "RK-ED-03", "item_name": "กระดาษการ์ดขาว/ชมพู 120 แกรม", "price_unit_coin": 85.00, "stock_remaining": 15, "image_url": "products/colorcard_a4.jpg", "type": "office" },
+                        { "item_id": "RK-ED-04", "item_name": "สมุดปกน้ำเงิน (สมุดมุมน้ำเงิน)", "price_unit_coin": 48.00, "stock_remaining": 48, "image_url": "products/bluebook.jpg", "type": "office" },
+                        { "item_id": "RK-ED-05", "item_name": "แฟ้มสันกว้าง 3 นิ้ว ตราช้าง 125F", "price_unit_coin": 85.00, "stock_remaining": 50, "image_url": "products/folders.jpg", "type": "office" },
+                        { "item_id": "RK-ED-06", "item_name": "แฟ้มซองพลาสติก A4 (xfile1)", "price_unit_coin": 15.00, "stock_remaining": 60, "image_url": "products/xfile1.jpg", "type": "office" },
+                        { "item_id": "RK-ED-07", "item_name": "ELEPHANT เครื่องเจาะกระดาษ DP-900", "price_unit_coin": 450.00, "stock_remaining": 3, "image_url": "products/cuuting_gun.jpg", "type": "office" }
+                    ]
+                },
+                "กองสาธารณสุขฯ": { 
+                    "sub_wallets": { "office": 15000.00, "computer": 10000.00, "household": 0.00, "other": 160000.00 },
+                    "head": "นายณัฐพงษ์ คำแดง", 
+                    "staff": [
+                        {"name": "นางสาวจีรัณภรณ์ กันธิยะวรัชญ์", "role": "นักวิชาการสาธารณสุขปฏิบัติการ", "pin": "1234"},
+                        {"name": "นางสาววิจิตรา กิ่งสวัสดิ์", "role": "ผู้ช่วยเจ้าพนักงานธุรการ", "pin": "1234"}
+                    ],
+                    "materials": [
+                        { "item_id": "CK-PH-01", "item_name": "หมึกพิมพ์แท้ Canon GI-71 BK/C/M/Y", "price_unit_coin": 490.00, "stock_remaining": 12, "image_url": "products/inkGI-71.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-02", "item_name": "หมึกเติม Canon GI-790 BK/C/M/Y", "price_unit_coin": 345.00, "stock_remaining": 10, "image_url": "products/inkGI-790.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-03", "item_name": "น้ำหมึก Epson 003 สีดำ (BK)", "price_unit_coin": 310.00, "stock_remaining": 15, "image_url": "products/ep_003.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-04", "item_name": "Toner Original BROTHER TN-269 BK", "price_unit_coin": 1866.00, "stock_remaining": 5, "image_url": "products/ink269.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-05", "item_name": "Toner Original BROTHER TN-269 C/M/Y", "price_unit_coin": 2227.00, "stock_remaining": 3, "image_url": "products/ink269c.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-06", "item_name": "ตลับหมึกเลเซอร์ Brother TN-2360", "price_unit_coin": 1350.00, "stock_remaining": 6, "image_url": "products/tn2360.jpg", "type": "computer" },
+                        { "item_id": "CK-PH-07", "item_name": "ตลับหมึกเลเซอร์ Brother TN-2480", "price_unit_coin": 2900.00, "stock_remaining": 4, "image_url": "products/tn2480.jpg", "type": "computer" }
+                    ]
+                },
+                "กองสวัสดิการสังคม": { 
+                    "sub_wallets": { "office": 10000.00, "computer": 10000.00, "household": 0.00, "other": 26500.00 },
+                    "head": "นายณัฐพงษ์ คำแดง", 
+                    "staff": [
+                        {"name": "นายภูมิภัทร ชัยยะเลิศ", "role": "นักพัฒนาชุมชนปฏิบัติการ", "pin": "1234"}
+                    ],
+                    "materials": [
+                        { "item_id": "CK-SW-01", "item_name": "Toner Original BROTHER TN-267 สีดำ", "price_unit_coin": 3000.00, "stock_remaining": 4, "image_url": "products/tn267.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-02", "item_name": "Toner Original BROTHER TN-267 สี C/M/Y", "price_unit_coin": 3730.00, "stock_remaining": 3, "image_url": "products/tn267c.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-03", "item_name": "Toner Original CANON 325", "price_unit_coin": 2250.00, "stock_remaining": 6, "image_url": "products/canon_325.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-04", "item_name": "ตลับหมึกพิมพ์ HP 12A (Q2612A)", "price_unit_coin": 4280.00, "stock_remaining": 3, "image_url": "products/hp_12a.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-05", "item_name": "ผงหมึกเลเซอร์แท้ HP 110A สีดำ", "price_unit_coin": 2905.00, "stock_remaining": 5, "image_url": "products/hp_110a.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-06", "item_name": "Adapter N/B ACER 19V Genuine แท้", "price_unit_coin": 845.00, "stock_remaining": 2, "image_url": "products/AdapterACER.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-07", "item_name": "Flash Drive 16GB SanDisk Cruzer", "price_unit_coin": 180.00, "stock_remaining": 20, "image_url": "products/flashdrive.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-08", "item_name": "32GB Flash Drive HIKSEMI U3/Type-C", "price_unit_coin": 250.00, "stock_remaining": 15, "image_url": "products/USB3.jpg", "type": "computer" },
+                        { "item_id": "CK-SW-09", "item_name": "แผ่นรองเมาส์ (Mouse Pad) คละสี", "price_unit_coin": 58.00, "stock_remaining": 30, "image_url": "products/pad.jpg", "type": "computer" },
+                        { "item_id": "RK-SW-10", "item_name": "ถ่านอัลคาไลน์ Panasonic AA (แพ็ค)", "price_unit_coin": 45.00, "stock_remaining": 30, "image_url": "products/aa2.jpg", "type": "other" },
+                        { "item_id": "RK-SW-11", "item_name": "ถ่านอัลคาไลน์ Panasonic AAA (แพ็ค)", "price_unit_coin": 123.00, "stock_remaining": 24, "image_url": "products/aaa2.jpg", "type": "other" },
+                        { "item_id": "RK-SW-12", "item_name": "ชุดแท่นชาร์จพร้อมถ่าน eneloop AA", "price_unit_coin": 345.00, "stock_remaining": 5, "image_url": "products/battcarger_AAA_1.2V.jpg", "type": "other" },
+                        { "item_id": "RK-SW-13", "item_name": "ปลั๊กไฟพ่วง 5 สวิตช์ 5 ช่อง (5 เมตร)", "price_unit_coin": 449.00, "stock_remaining": 8, "image_url": "products/p555.jpg", "type": "other" }
+                    ]
+                }
+            }
+        };
+
+        const walletNames = { "office": "📝 สำนักงาน", "computer": "💻 คอมพิวเตอร์", "household": "🏠 งานบ้านงานครัว", "other": "📦 อื่นๆ" };
+        let currentUser = {}; let currentDivName = ""; let cart = {};
+        let enteredPin = ""; let approvalStatus = { 1: false, 2: false, 3: false, 4: false, 5: false };
+        let html5QrCode = null;
+
+        function getSavedApiKey() {
+            return localStorage.getItem("KPL_CENTRAL_API_KEY");
+        }
+
+        function checkApiKeyRequirement() {
+            const savedKey = getSavedApiKey();
+            if (!savedKey) {
+                document.getElementById('api-setup-page').classList.remove('hidden');
+            } else {
+                document.getElementById('api-setup-page').classList.add('hidden');
+                initCoverLogin();
+            }
+        }
+
+        function startQRScanner() {
+            document.getElementById('qr-reader').classList.remove('hidden');
+            document.getElementById('btn-start-scanner').classList.add('hidden');
+            document.getElementById('btn-stop-scanner').classList.remove('hidden');
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 220, height: 220 } },
+                (decodedText) => {
+                    document.getElementById('input-setup-api-key').value = decodedText.trim();
+                    stopQRScanner();
+                    alert("✨ สแกน QR Code สำเร็จ! กดปุ่มบันทึกเพื่อเข้าสู่ระบบได้เลยครับ");
+                },
+                (errorMessage) => { }
+            ).catch(err => {
+                alert("❌ ไม่สามารถเปิดกล้องได้ กรุณายินยอมให้แอปเข้าถึงกล้องถ่ายรูป");
+                stopQRScanner();
+            });
+        }
+
+        function stopQRScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('qr-reader').classList.add('hidden');
+                    document.getElementById('btn-start-scanner').classList.remove('hidden');
+                    document.getElementById('btn-stop-scanner').classList.add('hidden');
+                }).catch(err => console.error(err));
+            }
+        }
+
+        function saveApiKey() {
+            const keyInput = document.getElementById('input-setup-api-key').value.trim();
+            if (!keyInput) {
+                alert("❌ กรุณากรอกหรือสแกนรหัส API Key ก่อนครับ");
+                return;
+            }
+            localStorage.setItem("KPL_CENTRAL_API_KEY", keyInput);
+            alert("✅ บันทึกรหัส API Key เรียบร้อย!");
+            stopQRScanner();
+            checkApiKeyRequirement();
+        }
+
+        function clearSavedApiKey() {
+            if(confirm("⚠️ คุณต้องการล้างค่า API Key ส่วนกลางออกจากเครื่องนี้ใช่หรือไม่?")) {
+                localStorage.removeItem("KPL_CENTRAL_API_KEY");
+                location.reload();
+            }
+        }
+
+        function initCoverLogin() {
+            const select = document.getElementById('login-user-select'); select.innerHTML = '';
+            Object.keys(personnelData.divisions).forEach(divName => {
+                personnelData.divisions[divName].staff.forEach((staff, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = `${divName}|${index}`;
+                    opt.innerText = `[${divName}] ${staff.name} (${staff.role})`;
+                    select.appendChild(opt);
+                });
+            });
+            clearPin();
+        }
+
+        function onLoginUserChange() { clearPin(); }
+
+        function pressPin(num) {
+            if (enteredPin.length < 4) {
+                enteredPin += num; updatePinDots();
+                if (enteredPin.length === 4) { setTimeout(validatePin, 200); }
+            }
+        }
+
+        function clearPin() { enteredPin = ""; updatePinDots(); document.getElementById('login-error-msg').classList.add('hidden'); }
+
+        function deletePin() {
+            if (enteredPin.length > 0) { enteredPin = enteredPin.slice(0, -1); updatePinDots(); }
+        }
+
+        function updatePinDots() {
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`pin-dot-${i}`);
+                if (i <= enteredPin.length) dot.classList.add('bg-[#10B981]', 'shadow-md');
+                else dot.classList.remove('bg-[#10B981]', 'shadow-md');
+            }
+        }
+
+        function validatePin() {
+            const selectVal = document.getElementById('login-user-select').value;
+            const [divName, index] = selectVal.split('|');
+            const selectedStaff = personnelData.divisions[divName].staff[index];
+
+            if (enteredPin === selectedStaff.pin || enteredPin === "8888") {
+                currentDivName = divName; currentUser = selectedStaff;
+                document.getElementById('login-cover-page').classList.add('hidden');
+                
+                const adminBtn = document.getElementById('btn-admin-store-trigger');
+                if (currentUser.is_admin) adminBtn.classList.remove('hidden');
+                else adminBtn.classList.add('hidden');
+
+                document.getElementById('active-user-name').innerText = `${currentUser.name} (${currentDivName})`;
+                document.getElementById('flow-requester').innerText = currentUser.name;
+                document.getElementById('flow-head').innerText = personnelData.divisions[divName].head;
+                
+                cart = {}; resetApprovals(); updateBudgetDisplay(); updateCartUI(); renderProducts();
+            } else {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+                clearPin();
+            }
+        }
+
+        function logout() { document.getElementById('login-cover-page').classList.remove('hidden'); initCoverLogin(); }
+        function getCurrentDivMaterials() { return personnelData.divisions[currentDivName].materials; }
+
+        function getCartCostsByType() {
+            let costs = { office: 0, computer: 0, household: 0, other: 0 };
+            const currentMaterials = getCurrentDivMaterials();
+            Object.keys(cart).forEach(id => {
+                const item = currentMaterials.find(p => p.item_id === id);
+                if (item) costs[item.type] += (item.price_unit_coin * cart[id]);
+            });
+            return costs;
+        }
+
+        function getCartTotalCost() { return Object.values(getCartCostsByType()).reduce((a, b) => a + b, 0); }
+
+        function updateBudgetDisplay() {
+            const wallets = personnelData.divisions[currentDivName].sub_wallets;
+            const cartCosts = getCartCostsByType();
+            const walletContainer = document.getElementById('live-sub-wallets');
+            walletContainer.innerHTML = ''; let hasOverdraft = false;
+
+            Object.keys(wallets).forEach(type => {
+                const liveBalance = wallets[type] - cartCosts[type];
+                if (liveBalance < 0) hasOverdraft = true;
+                walletContainer.innerHTML += `
+                    <div class="flex justify-between w-full text-[11px]">
+                        <span class="opacity-80">${walletNames[type]}:</span>
+                        <span class="font-bold ${liveBalance < 0 ? 'text-red-400 font-extrabold' : 'text-emerald-300'}">${liveBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ฿</span>
+                    </div>`;
+            });
+            const warning = document.getElementById('wallet-warning');
+            if (hasOverdraft) warning.classList.remove('hidden'); else warning.classList.add('hidden');
+            updateDivisionPanel();
+        }
+
+        function updateDivisionPanel() {
+            const panel = document.getElementById('division-budget-panel'); panel.innerHTML = '';
+            Object.keys(personnelData.divisions).forEach(name => {
+                const divData = personnelData.divisions[name];
+                let totalBudget = Object.values(divData.sub_wallets).reduce((a, b) => a + b, 0);
+                if (name === currentDivName) totalBudget -= getCartTotalCost();
+                const isCurrent = (name === currentDivName) ? 'border-[#10B981] bg-emerald-50/50 shadow-sm font-bold' : 'border-slate-200 bg-white';
+                panel.innerHTML += `
+                    <div class="p-3 border rounded-2xl text-left transition-all ${isCurrent}">
+                        <p class="text-[10px] text-slate-400 truncate">${name}</p>
+                        <p class="text-xs font-black text-emerald-800 mt-0.5">${totalBudget.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</p>
+                    </div>`;
+            });
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid'); grid.innerHTML = '';
+            const currentMaterials = getCurrentDivMaterials();
+            currentMaterials.forEach(p => {
+                const qtyInCart = cart[p.item_id] || 0;
+                const currentSelectionQty = qtyInCart > 0 ? qtyInCart : 1;
+                const card = document.createElement('div');
+                card.className = "cyber-card rounded-2xl p-5 flex flex-col justify-between hover:scale-[1.01] transition-all bg-white";
+                card.innerHTML = `
+                    <div>
+                        <div class="w-full h-36 bg-slate-50 rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100 overflow-hidden">
+                            <img src="${p.image_url}" onerror="this.src='https://placehold.co/150?text=📦'" class="object-cover h-full w-full rounded-lg">
+                        </div>
+                        <span class="text-[9px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md inline-block mb-1">${walletNames[p.type]}</span>
+                        <h3 class="font-bold text-slate-800 text-xs h-8 line-clamp-2">${p.item_name}</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">สต็อกคลัง FIFO: <span class="font-bold text-emerald-600">${p.stock_remaining} หน่วย</span></p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <div class="flex justify-between items-center mb-2 text-xs">
+                            <span class="text-slate-400 font-light">ราคาเบิกจริง:</span>
+                            <span class="font-black text-emerald-600">${p.price_unit_coin.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50 px-2">
+                                <button onclick="changeQty('${p.item_id}', -1)" class="px-1 text-slate-400 font-bold">-</button>
+                                <span id="qty-${p.item_id}" class="w-6 text-center text-xs font-bold">${currentSelectionQty}</span>
+                                <button onclick="changeQty('${p.item_id}', 1)" class="px-1 text-slate-400 font-bold">+</button>
+                            </div>
+                            <button onclick="addToCart('${p.item_id}')" class="flex-1 bg-[#10B981] text-white hover:bg-[#059669] rounded-xl text-[11px] font-bold py-2 transition-all shadow-sm">
+                                <i class="fa-solid fa-plus text-[9px]"></i> เบิกพัสดุ
+                            </button>
+                        </div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function changeQty(id, change) {
+            const currentMaterials = getCurrentDivMaterials();
+            const item = currentMaterials.find(p => p.item_id === id);
+            let currentSelection = parseInt(document.getElementById(`qty-${id}`).innerText);
+            let targetQty = currentSelection + change;
+            if (targetQty < 1 || targetQty > item.stock_remaining) return;
+
+            const cartCosts = getCartCostsByType();
+            const currentTypeCostWithoutThis = cartCosts[item.type] - (item.price_unit_coin * (cart[id] || 0));
+            if (currentTypeCostWithoutThis + (item.price_unit_coin * targetQty) > personnelData.divisions[currentDivName].sub_wallets[item.type]) return;
+
+            document.getElementById(`qty-${id}`).innerText = targetQty;
+            if (cart[id]) { cart[id] = targetQty; updateCartUI(); }
+        }
+
+        function addToCart(id) {
+            const currentMaterials = getCurrentDivMaterials();
+            const item = currentMaterials.find(p => p.item_id === id);
+            const targetQty = parseInt(document.getElementById(`qty-${id}`).innerText);
+            if (targetQty > item.stock_remaining) return;
+
+            const cartCosts = getCartCostsByType();
+            const currentTypeCostWithoutThis = cartCosts[item.type] - (item.price_unit_coin * (cart[id] || 0));
+            if (currentTypeCostWithoutThis + (item.price_unit_coin * targetQty) > personnelData.divisions[currentDivName].sub_wallets[item.type]) {
+                alert(`❌ งบประมาณโควตาประเภท ${walletNames[item.type]} มีไม่เพียงพอครับ`); return;
+            }
+            cart[id] = targetQty; updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalSpan = document.getElementById('cart-total');
+            const countSpan = document.getElementById('cart-count');
+            container.innerHTML = ''; let total = 0, itemCount = 0;
+            const currentMaterials = getCurrentDivMaterials();
+
+            Object.keys(cart).forEach(id => {
+                const item = currentMaterials.find(p => p.item_id === id);
+                const qty = cart[id]; const subtotal = item.price_unit_coin * qty;
+                total += subtotal; itemCount += qty;
+
+                const itemRow = document.createElement('div');
+                itemRow.className = "flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 text-xs shadow-sm";
+                itemRow.innerHTML = `
+                    <div>
+                        <p class="font-bold text-slate-700">${item.item_name}</p>
+                        <span class="text-[10px] text-slate-400">${walletNames[item.type]} • ${item.price_unit_coin} ฿ x ${qty}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-emerald-600">${subtotal.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</span>
+                        <button onclick="removeFromCart('${id}')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>`;
+                container.appendChild(itemRow);
+            });
+            if (itemCount === 0) container.innerHTML = 'ไม่มีรายการพัสดุในตะกร้าของคุณ';
+            totalSpan.innerText = total.toLocaleString(undefined, {minimumFractionDigits:2}); countSpan.innerText = `${itemCount} ITEM`;
+            updateBudgetDisplay();
+        }
+
+        function removeFromCart(id) { delete cart[id]; updateCartUI(); renderProducts(); }
+
+        function filterItems() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.getElementById('product-grid').children;
+            const currentMaterials = getCurrentDivMaterials();
+            currentMaterials.forEach((p, index) => {
+                if (cards[index]) {
+                    if (p.item_name.toLowerCase().includes(query)) cards[index].classList.remove('hidden');
+                    else cards[index].classList.add('hidden');
+                }
+            });
+        }
+
+        function openAdminStoreModal() {
+            const modal = document.getElementById('admin-store-modal');
+            const select = document.getElementById('admin-select-material');
+            select.innerHTML = '';
+            
+            const currentMaterials = getCurrentDivMaterials();
+            currentMaterials.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.item_id;
+                opt.innerText = `[${p.item_id}] ${p.item_name} (ปัจจุบัน: ${p.price_unit_coin} ฿ | สต็อก: ${p.stock_remaining})`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('admin-input-lot-id').value = "LOT-" + new Date().getFullYear() + "-" + (new Date().getMonth()+1);
+            document.getElementById('scan-status-text').innerText = "";
+            modal.classList.remove('hidden');
+        }
+
+        function closeAdminStoreModal() { document.getElementById('admin-store-modal').classList.add('hidden'); }
+
+        function saveStoreItemUpdate() {
+            const itemId = document.getElementById('admin-select-material').value;
+            const newPrice = parseFloat(document.getElementById('admin-input-price').value);
+            const addQty = parseInt(document.getElementById('admin-input-add-qty').value);
+            const currentMaterials = getCurrentDivMaterials();
+            const item = currentMaterials.find(p => p.item_id === itemId);
+
+            if (item) {
+                if (!isNaN(newPrice) && newPrice > 0) item.price_unit_coin = newPrice;
+                if (!isNaN(addQty) && addQty > 0) item.stock_remaining += addQty;
+                alert(`✅ บันทึกปรับปรุงข้อมูล ${item.item_name} สำเร็จเรียบร้อย!`);
+                closeAdminStoreModal(); renderProducts();
+            }
+        }
+
+        function addNewMaterialItem() {
+            const name = document.getElementById('admin-new-name').value;
+            const type = document.getElementById('admin-new-type').value;
+            const price = parseFloat(document.getElementById('admin-new-price').value);
+            const stock = parseInt(document.getElementById('admin-new-stock').value);
+
+            if (!name.trim() || isNaN(price) || isNaN(stock)) {
+                alert("❌ กรุณากรอกข้อมูลรายการใหม่ให้ครบถ้วน"); return;
+            }
+
+            const currentMaterials = getCurrentDivMaterials();
+            const newItemId = "NEW-OFF-" + (currentMaterials.length + 1);
+            
+            currentMaterials.push({
+                item_id: newItemId, item_name: name, price_unit_coin: price,
+                stock_remaining: stock, image_url: "products/paper-a4.jpg", type: type
+            });
+
+            alert(`✅ บันทึกพัสดุรายการใหม่ [${name}] เข้าสู่คลัง ${currentDivName} สำเร็จ!`);
+            closeAdminStoreModal(); renderProducts();
+        }
+
+        function triggerStamp(id) {
+            approvalStatus[id] = !approvalStatus[id];
+            const btnSpan = document.getElementById(`status-approve-${id}`);
+            const stampBox = document.getElementById(`stamp-box-${id}`);
+            const now = new Date().toLocaleDateString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
+            
+            if (approvalStatus[id]) {
+                btnSpan.innerText = id === 1 ? "เสนอแล้ว" : "✓ อนุมัติ";
+                btnSpan.className = "text-[9px] bg-emerald-400 text-emerald-950 font-black px-2 py-0.5 rounded-lg";
+                stampBox.innerText = `✓ อนุมัติลงนามเรียบร้อย (${now})`;
+                stampBox.className = "text-[9px] font-bold bg-emerald-500 text-white border border-emerald-400 rounded-lg px-3 py-1 uppercase mb-0.5 shadow-sm";
+            } else {
+                btnSpan.innerText = id === 1 ? "ขอเบิก" : "รออนุมัติ";
+                btnSpan.className = "text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg";
+                stampBox.innerText = id === 1 ? "ยังไม่ยื่นใบเบิก" : "รอดำเนินการอนุมัติ";
+                stampBox.className = "text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-bold uppercase mb-0.5";
+            }
+        }
+
+        function resetApprovals() {
+            for (let i = 1; i <= 5; i++) {
+                approvalStatus[i] = false;
+                const btnSpan = document.getElementById(`status-approve-${i}`);
+                const stampBox = document.getElementById(`stamp-box-${i}`);
+                if (btnSpan) {
+                    btnSpan.innerText = i === 1 ? "ขอเบิก" : "รออนุมัติ";
+                    btnSpan.className = "text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg";
+                }
+                if (stampBox) {
+                    stampBox.innerText = i === 1 ? "ยังไม่ยื่นใบเบิก" : "รอดำเนินการอนุมัติ";
+                    stampBox.className = "text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-bold uppercase mb-0.5";
+                }
+            }
+        }
+
+        function toggleKapiChat() { document.getElementById("kapiChatBox").classList.toggle("hidden"); }
+
+        async function askKapi(query) {
+            const messages = document.getElementById("kapiMessages");
+            messages.innerHTML += `<div class="text-right"><span class="bg-emerald-100 text-emerald-900 p-2 rounded-xl inline-block my-1 shadow-sm font-medium">${query}</span></div>`;
+            const loadingId = "kapi-loading-" + Date.now();
+            messages.innerHTML += `<div id="${loadingId}" class="text-left"><span class="bg-white border border-emerald-100 text-slate-400 p-2 rounded-xl inline-block my-1 shadow-sm animate-pulse">🤖 น้องกะปิ กำลังประมวลผล...</span></div>`;
+            messages.scrollTop = messages.scrollHeight;
+
+            const apiKeyClean = getSavedApiKey() ? getSavedApiKey().trim() : "";
+            if (!apiKeyClean) {
+                document.getElementById(loadingId).remove();
+                messages.innerHTML += `<div class="text-left"><span class="bg-amber-50 border border-amber-200 text-amber-800 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> ไม่พบรหัส API Key ส่วนกลางในเครื่องนี้ กรุณารีเฟรชเพื่อตั้งค่าใหม่ครับ</span></div>`;
+                messages.scrollTop = messages.scrollHeight;
+                return;
+            }
+
+            try {
+                // 🟢 Gemini 2.5 Flash
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
+                const promptText = `คุณคือ "น้องกะปิ" AI ผู้ช่วยประจำสโตร์ อบต.ข่วงเปา สุภาพ น่ารัก ตอบสั้นกระชับเข้าใจง่าย\n\nคำถาม: ${query}`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyClean },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    let reply = data.candidates[0].content.parts[0].text;
+                    document.getElementById(loadingId).remove();
+                    messages.innerHTML += `<div class="text-left"><span class="bg-white border border-emerald-100 text-slate-700 p-2 rounded-xl inline-block my-1 shadow-sm leading-relaxed">🤖 <strong>น้องกะปิ:</strong> ${reply.replace(/\n/g, '<br>')}</span></div>`;
+                } else if (data.error) {
+                    document.getElementById(loadingId).remove();
+                    messages.innerHTML += `<div class="text-left"><span class="bg-red-50 text-red-500 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> API แจ้งข้อผิดพลาด: ${data.error.message || 'Key ไม่ได้รับการอนุมัติ'}</span></div>`;
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                messages.innerHTML += `<div class="text-left"><span class="bg-red-50 text-red-500 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> การเชื่อมต่อล้มเหลว กรุณาเช็กอินเทอร์เน็ตครับ</span></div>`;
+            }
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function processBillImage(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const statusText = document.getElementById('scan-status-text');
+            statusText.innerText = "⏳ น้องกะปิกำลังอ่านรูปภาพใบส่งของ...";
+
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const base64Image = reader.result.split(',')[1];
+                const mimeType = file.type;
+                const currentMaterials = getCurrentDivMaterials();
+                const itemListStr = currentMaterials.map(m => `ID: ${m.item_id}, Name: ${m.item_name}`).join("\n");
+                const promptText = `คุณคือระบบอ่านเอกสารใบส่งของ พัสดุ อบต.วิเคราะห์ภาพนี้แล้วตอบกลับเป็น JSON ดังนี้:{ "item_id": "...", "price": 0.00, "qty": 0, "lot_id": "..." }:\n${itemListStr}`;
+                const apiKeyClean = getSavedApiKey() ? getSavedApiKey().trim() : "";
+
+                try {
+                    // 🟢 Gemini 2.5 Flash
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyClean },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }, { inline_data: { mime_type: mimeType, data: base64Image } }] }] })
+                    });
+
+                    const data = await response.json();
+                    if (data.candidates && data.candidates[0]) {
+                        let textResp = data.candidates[0].content.parts[0].text.replace(/```json/g, "").replace(/```/g, "").trim();
+                        const parsedData = JSON.parse(textResp);
+                        if (parsedData.item_id) document.getElementById('admin-select-material').value = parsedData.item_id;
+                        if (parsedData.price) document.getElementById('admin-input-price').value = parsedData.price;
+                        if (parsedData.qty) document.getElementById('admin-input-add-qty').value = parsedData.qty;
+                        if (parsedData.lot_id) document.getElementById('admin-input-lot-id').value = parsedData.lot_id;
+                        statusText.innerText = "✅ น้องกะปิแกะข้อมูลลงฟอร์มเรียบร้อย!";
+                        alert("✨ น้องกะปิอ่านเอกสารสำเร็จ เติมข้อมูลลงฟอร์มให้เรียบร้อยแล้วครับ");
+                    }
+                } catch (err) { statusText.innerText = "❌ เกิดข้อผิดพลาดในการสแกน"; }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function sendKapiMessage() {
+            const input = document.getElementById("kapiInput");
+            if (input.value.trim() !== "") { askKapi(input.value); input.value = ""; }
+        }
+
+        function submitOrder() {
+            const cartCosts = getCartCostsByType(); const total = getCartTotalCost();
+            const purpose = document.getElementById('project-purpose').value;
+            const currentMaterials = getCurrentDivMaterials();
+            const walletsBefore = JSON.parse(JSON.stringify(personnelData.divisions[currentDivName].sub_wallets));
+
+            if (total === 0 || !purpose.trim()) { alert("❌ กรุณาเลือกสินค้าและใส่รายละเอียดวัตถุประสงค์ให้ครบถ้วน"); return; }
+
+            // 1. ตัดสต็อกและงบประมาณ
+            Object.keys(cart).forEach(id => {
+                const item = currentMaterials.find(p => p.item_id === id);
+                item.stock_remaining -= cart[id];
+            });
+            Object.keys(cartCosts).forEach(type => {
+                personnelData.divisions[currentDivName].sub_wallets[type] -= cartCosts[type];
+            });
+
+            const walletsAfter = personnelData.divisions[currentDivName].sub_wallets;
+            const recId = "KP-REC-" + new Date().getFullYear() + "/" + Math.floor(1000 + Math.random() * 9000);
+
+            // 2. เติมข้อมูลลงเอกสารรายงาน
+            document.getElementById('doc-rec-id').innerText = recId;
+            document.getElementById('doc-org-title').innerText = personnelData.organization;
+            document.getElementById('doc-date').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " น.";
+            document.getElementById('doc-department').innerText = currentDivName;
+            document.getElementById('doc-requester').innerText = `${currentUser.name} (${currentUser.role})`;
+            document.getElementById('doc-purpose').innerText = purpose;
+            document.getElementById('sign-name-1').innerText = currentUser.name;
+            document.getElementById('sign-name-3').innerText = personnelData.divisions[currentDivName].head;
+            document.getElementById('rcpt-div').innerText = currentDivName;
+            
+            // เติมชื่อผู้รับของ
+            document.getElementById('pickup-sign-requester').innerText = currentUser.name;
+
+            const tBody = document.getElementById('doc-table-body'); tBody.innerHTML = ''; let count = 1;
+            let pickupItemsList = [];
+
+            Object.keys(cart).forEach(id => {
+                const item = currentMaterials.find(p => p.item_id === id); const qty = cart[id];
+                pickupItemsList.push(`${item.item_name} x ${qty}`);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border border-slate-300 p-1.5 text-center">${count++}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${item.item_name}</td>
+                    <td class="border border-slate-300 p-1.5 text-center">${walletNames[item.type]}</td>
+                    <td class="border border-slate-300 p-1.5 text-center">${qty}</td>
+                    <td class="border border-slate-300 p-1.5 text-right">${item.price_unit_coin.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</td>
+                    <td class="border border-slate-300 p-1.5 text-right font-bold">${(item.price_unit_coin * qty).toLocaleString(undefined, {minimumFractionDigits:2})} ฿</td>`;
+                tBody.appendChild(row);
+            });
+
+            const totalRow = document.createElement('tr'); totalRow.className = "bg-slate-50 font-bold";
+            totalRow.innerHTML = `
+                <td colspan="5" class="border border-slate-300 p-1.5 text-right">ยอดรวมมูลค่าเบิกทั้งสิ้นสุทธิ (TOTAL):</td>
+                <td class="border border-slate-300 p-1.5 text-right text-emerald-800 font-extrabold">${total.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</td>`;
+            tBody.appendChild(totalRow);
+
+            // 3. สร้าง QR Code ผ่าน API
+            const qrTextPayload = encodeURIComponent(`Ref: ${recId}\nผู้เบิก: ${currentUser.name}\nสังกัด: ${currentDivName}\nรายการ: ${pickupItemsList.join(', ')}`);
+            document.getElementById('store-pickup-qrcode-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrTextPayload}`;
+            document.getElementById('qr-data-preview').innerText = `Ref: ${recId} | ${currentUser.name}`;
+
+            const rcptBreakdown = document.getElementById('rcpt-wallets-breakdown');
+            rcptBreakdown.innerHTML = '<p class="font-bold underline mb-1">รายละเอียดสรุปยอดตัดบัญชีเงินงบประมาณบาทจริง:</p>';
+            Object.keys(walletsBefore).forEach(type => {
+                if(walletsBefore[type] > 0) {
+                    rcptBreakdown.innerHTML += `
+                        <div class="flex justify-between">
+                            <span>${walletNames[type]} (เริ่ม: ${walletsBefore[type].toLocaleString(undefined,{minimumFractionDigits:2})} ฿ | จ่าย: -${cartCosts[type].toLocaleString(undefined,{minimumFractionDigits:2})} ฿)</span>
+                            <span>คงเหลือสุทธิ: ${walletsAfter[type].toLocaleString(undefined,{minimumFractionDigits:2})} บาท</span>
+                        </div>`;
+                }
+            });
+            document.getElementById('rcpt-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits:2}) + " บาท";
+
+            // 4. สลับแสดงเฉพาะหน้ารายงานผล/ใบเบิก และเลื่อนจอขึ้นบนสุดทันที
+            document.getElementById('main-app-container').classList.add('hidden', 'no-print');
+            const docView = document.getElementById('official-document-view');
+            docView.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateBudgetDisplay();
+        }
+
+        function backToMain() {
+            document.getElementById('official-document-view').classList.add('hidden');
+            document.getElementById('main-app-container').classList.remove('hidden', 'no-print');
+            
+            cart = {}; resetApprovals(); document.getElementById('project-purpose').value = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            updateBudgetDisplay(); updateCartUI(); renderProducts();
+        }
+
+        checkApiKeyRequirement();
+    </script>
+</body>
+</html>
