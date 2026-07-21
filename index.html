@@ -3,139 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-MART v5.0 - ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง อบต.ข่วงเปา</title>
+    <title>K-MART v5.2 - ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง อบต.ข่วงเปา</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #F0F4F1; }
-        .cyber-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 236, 229, 0.8); box-shadow: 0 8px 32px 0 rgba(140, 160, 145, 0.08); }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: linear-gradient(135deg, #051A14 0%, #0B2B22 50%, #0F382C 100%);
+            background-attachment: fixed;
+            color: #E2E8F0;
+        }
+
+        .glass-panel {
+            background: rgba(13, 45, 38, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: #10B981;
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.25), 0 8px 10px -6px rgba(16, 185, 129, 0.2);
+        }
+
+        .neon-glow-btn {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .neon-glow-btn:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.8);
+            transform: scale(1.02);
+        }
+
         .watermark-container { position: relative; }
         .watermark-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; opacity: 0.05; pointer-events: none; z-index: 50; }
         .kapi-bot-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-        .pin-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 1px solid #10B981; color: #0D2D26; font-weight: bold; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .pin-btn:hover { background: #10B981; color: white; transform: scale(1.08); }
-        .pin-btn:active { transform: scale(0.95); }
+        
+        .pin-btn { 
+            width: 58px; height: 58px; border-radius: 50%; 
+            background: #F0FDF4; border: 2px solid #10B981; 
+            color: #064E3B; font-weight: 800; font-size: 1.3rem; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: all 0.15s ease-in-out; 
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .pin-btn:hover { background: #D1FAE5; transform: scale(1.05); }
+        .pin-btn:active, .pin-btn.active-press { 
+            background: #10B981 !important; color: #ffffff !important; 
+            transform: scale(0.92) !important; box-shadow: 0 0 15px #10B981 !important; 
+        }
+
+        .pin-dot-filled {
+            background-color: #10B981 !important; border-color: #059669 !important;
+            box-shadow: 0 0 12px #10B981, 0 0 4px #10B981 !important; transform: scale(1.25) !important;
+        }
 
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm 12mm 10mm 12mm;
-            }
-            body { 
-                background-color: #ffffff !important; 
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+            @page { size: A4 portrait; margin: 10mm 12mm 10mm 12mm; }
+            body { background: #ffffff !important; color: #000 !important; padding: 0 !important; margin: 0 !important; }
             .no-print { display: none !important; }
-            .print-area { 
-                display: block !important; 
-                width: 100% !important; 
-                box-shadow: none !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                border: none !important;
-            }
-            .page-break-before { 
-                break-before: page !important; 
-                page-break-before: always !important; 
-                margin-top: 0.5rem !important;
-            }
-            .print-compact { padding: 0.5rem !important; }
+            .print-area { display: block !important; width: 100% !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; border: none !important; }
+            .page-break-before { break-before: page !important; page-break-before: always !important; margin-top: 0.5rem !important; }
         }
     </style>
 </head>
-<body class="min-h-screen pb-16 text-slate-800">
+<body class="min-h-screen pb-16">
 
     <!-- ==================== 0. SETUP API KEY MODAL ==================== -->
-    <div id="api-setup-page" class="fixed inset-0 z-[150] bg-[#0D2D26] flex items-center justify-center p-4 hidden">
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 border border-emerald-500/30 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-[#10B981]">
-                <i class="fa-solid fa-key text-3xl text-[#10B981]"></i>
+    <div id="api-setup-page" class="fixed inset-0 z-[150] bg-[#03120E] flex items-center justify-center p-4 hidden">
+        <div class="max-w-md w-full glass-panel rounded-3xl p-6 text-center border-2 border-[#10B981]/50 shadow-[0_0_50px_rgba(16,185,129,0.3)]">
+            <div class="w-16 h-16 mx-auto mb-4 bg-[#10B981]/20 rounded-2xl flex items-center justify-center border-2 border-[#10B981] shadow-[0_0_20px_#10B981]">
+                <i class="fa-solid fa-key text-3xl text-[#34D399]"></i>
             </div>
-            <h3 class="text-lg font-bold text-[#0D2D26] mb-1">ตั้งค่าระบบครั้งแรก (อบต.ข่วงเปา)</h3>
-            <p class="text-xs text-slate-500 mb-4">ระบบกำลังเปิดใช้งานด้วยรหัสสิทธิ์ส่วนกลาง อบต.</p>
-            
-            <div id="qr-reader" class="mb-4 overflow-hidden rounded-2xl border-2 border-emerald-300 hidden"></div>
-
-            <div class="space-y-3">
-                <button onclick="saveApiKeyManually()" class="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-3 text-xs rounded-xl shadow-md">
-                    <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i> เข้าสู่หน้าลงชื่อเข้าใช้
-                </button>
-            </div>
+            <h3 class="text-lg font-bold text-white mb-1">ตั้งค่าระบบครั้งแรก (อบต.ข่วงเปา)</h3>
+            <p class="text-xs text-emerald-200/70 mb-4">ระบบกำลังเปิดใช้งานด้วยรหัสสิทธิ์ส่วนกลาง อบต.</p>
+            <button onclick="saveApiKeyManually()" class="w-full neon-glow-btn text-white font-bold py-3 text-xs rounded-xl uppercase tracking-wider">
+                <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i> เข้าสู่หน้าลงชื่อเข้าใช้
+            </button>
         </div>
     </div>
 
     <!-- ==================== 1. LOGIN COVER PAGE ==================== -->
-    <div id="login-cover-page" class="fixed inset-0 z-[100] bg-gradient-to-br from-[#0D2D26] via-[#134035] to-[#0A221C] flex items-center justify-center p-4 overflow-y-auto">
-        <div class="max-w-4xl w-full bg-white/10 backdrop-filter backdrop-blur-xl border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+    <div id="login-cover-page" class="fixed inset-0 z-[100] bg-gradient-to-br from-[#020B08] via-[#07241C] to-[#010806] flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-4xl w-full glass-panel border-2 border-emerald-500/40 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.8)] overflow-hidden grid grid-cols-1 md:grid-cols-2">
             
-            <div class="p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-emerald-500/20 bg-gradient-to-b from-black/20 to-transparent text-white">
+            <div class="p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-emerald-500/30 bg-gradient-to-b from-emerald-950/40 to-transparent text-white">
                 <div>
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
-                            <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
+                        <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full ring-4 ring-[#10B981]/50 shadow-[0_0_25px_#10B981]">
+                            <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover">
                         </div>
                         <div>
-                            <h2 class="text-xl font-black tracking-wider text-[#A7F3D0]">K-MART</h2>
-                            <p class="text-[10px] text-emerald-200">v5.0 • อบต.ข่วงเปา</p>
+                            <h2 class="text-2xl font-black tracking-wider text-[#6EE7B7] drop-shadow-[0_0_10px_#10B981]">K-MART</h2>
+                            <p class="text-[10px] text-emerald-300 font-bold">v5.2 • อบต.ข่วงเปา</p>
                         </div>
                     </div>
                     
-                    <div class="my-6 relative rounded-2xl overflow-hidden border border-emerald-400/30 p-4 bg-[#0D2D26]/60 text-center">
-                        <div class="w-20 h-20 mx-auto mb-2 rounded-full border-2 border-[#10B981] p-1 flex items-center justify-center bg-emerald-950/80 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                            <i class="fa-solid fa-train-subway text-3xl text-[#10B981]"></i>
+                    <div class="my-6 relative rounded-2xl overflow-hidden border border-emerald-400/40 p-5 bg-[#031711]/80 text-center shadow-inner">
+                        <div class="w-20 h-20 mx-auto mb-3 rounded-full border-2 border-[#10B981] p-1 flex items-center justify-center bg-emerald-950/90 shadow-[0_0_25px_rgba(16,185,129,0.7)]">
+                            <i class="fa-solid fa-bolt text-3xl text-[#34D399]"></i>
                         </div>
-                        <h3 class="font-bold text-sm text-[#A7F3D0]">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง</h3>
-                        <p class="text-[10px] text-emerald-100/70 mt-1">คลังพัสดุ FIFO • ราคาบาทจริง • ผู้ช่วย "น้องกะปิ" Gemini AI</p>
+                        <h3 class="font-bold text-sm text-[#A7F3D0] tracking-wide">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง</h3>
+                        <p class="text-[10px] text-emerald-200/80 mt-1">คลังพัสดุ FIFO • เพิ่มสินค้าแบบทางการ/อิสระ • อัปโหลดรูปจริง</p>
                     </div>
                 </div>
                 
-                <div class="text-[10px] text-emerald-300/60 text-center md:text-left">
+                <div class="text-[10px] text-emerald-400/80 text-center md:text-left font-semibold">
                     <p>© องค์การบริหารส่วนตำบลข่วงเปา • ระบบพร้อมยื่นประเมิน LPA</p>
                 </div>
             </div>
 
-            <div class="p-8 flex flex-col justify-center bg-white/90 text-slate-800">
+            <div class="p-8 flex flex-col justify-center bg-white/95 text-slate-800 backdrop-blur-md">
                 <div class="text-center mb-6">
-                    <h3 class="text-lg font-bold text-[#0D2D26]"><i class="fa-solid fa-shield-halved text-[#10B981] mr-2"></i>เข้าสู่ระบบปฏิบัติการ</h3>
-                    <p class="text-xs text-slate-500">เลือกตำแหน่งและใส่รหัส PIN 4 หลักเพื่อยืนยันตัวตน</p>
+                    <h3 class="text-xl font-black text-[#0D2D26] tracking-wide"><i class="fa-solid fa-shield-halved text-[#10B981] mr-2"></i>เข้าสู่ระบบปฏิบัติการ</h3>
+                    <p class="text-xs text-slate-500 font-medium">เลือกตำแหน่งและใส่รหัส PIN 4 หลักเพื่อยืนยันตัวตน</p>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-600 mb-1">👤 เลือกตำแหน่ง / ผู้ใช้งาน:</label>
-                        <select id="login-user-select" onchange="onLoginUserChange()" class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#10B981]">
+                        <label class="block text-[10px] uppercase font-extrabold text-emerald-900 mb-1 tracking-wider">👤 เลือกตำแหน่ง / ผู้ใช้งาน:</label>
+                        <select id="login-user-select" onchange="onLoginUserChange()" class="w-full bg-emerald-50/50 border-2 border-emerald-300 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#10B981]">
                         </select>
                     </div>
 
                     <div class="text-center">
-                        <p class="text-[10px] text-slate-400 mb-2 font-semibold">ป้อนรหัส PIN 4 หลัก:</p>
-                        <div class="flex justify-center gap-3 mb-4">
-                            <div id="pin-dot-1" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
-                            <div id="pin-dot-2" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
-                            <div id="pin-dot-3" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
-                            <div id="pin-dot-4" class="w-4 h-4 rounded-full border-2 border-[#10B981] bg-white transition-all"></div>
+                        <p class="text-[10px] text-slate-500 mb-2 font-bold">ป้อนรหัส PIN 4 หลัก:</p>
+                        <div class="flex justify-center gap-4 mb-5">
+                            <div id="pin-dot-1" class="w-5 h-5 rounded-full border-2 border-emerald-400 bg-slate-100 transition-all duration-150"></div>
+                            <div id="pin-dot-2" class="w-5 h-5 rounded-full border-2 border-emerald-400 bg-slate-100 transition-all duration-150"></div>
+                            <div id="pin-dot-3" class="w-5 h-5 rounded-full border-2 border-emerald-400 bg-slate-100 transition-all duration-150"></div>
+                            <div id="pin-dot-4" class="w-5 h-5 rounded-full border-2 border-emerald-400 bg-slate-100 transition-all duration-150"></div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 max-w-[210px] mx-auto justify-items-center">
-                        <button onclick="pressPin('1')" class="pin-btn">1</button>
-                        <button onclick="pressPin('2')" class="pin-btn">2</button>
-                        <button onclick="pressPin('3')" class="pin-btn">3</button>
-                        <button onclick="pressPin('4')" class="pin-btn">4</button>
-                        <button onclick="pressPin('5')" class="pin-btn">5</button>
-                        <button onclick="pressPin('6')" class="pin-btn">6</button>
-                        <button onclick="pressPin('7')" class="pin-btn">7</button>
-                        <button onclick="pressPin('8')" class="pin-btn">8</button>
-                        <button onclick="pressPin('9')" class="pin-btn">9</button>
-                        <button onclick="clearPin()" class="pin-btn text-xs text-red-500 bg-red-50 border-red-200">C</button>
-                        <button onclick="pressPin('0')" class="pin-btn">0</button>
-                        <button onclick="deletePin()" class="pin-btn text-xs text-slate-500"><i class="fa-solid fa-delete-left"></i></button>
+                    <div class="grid grid-cols-3 gap-3 max-w-[220px] mx-auto justify-items-center">
+                        <button onclick="pressPin('1', this)" class="pin-btn">1</button>
+                        <button onclick="pressPin('2', this)" class="pin-btn">2</button>
+                        <button onclick="pressPin('3', this)" class="pin-btn">3</button>
+                        <button onclick="pressPin('4', this)" class="pin-btn">4</button>
+                        <button onclick="pressPin('5', this)" class="pin-btn">5</button>
+                        <button onclick="pressPin('6', this)" class="pin-btn">6</button>
+                        <button onclick="pressPin('7', this)" class="pin-btn">7</button>
+                        <button onclick="pressPin('8', this)" class="pin-btn">8</button>
+                        <button onclick="pressPin('9', this)" class="pin-btn">9</button>
+                        <button onclick="clearPin()" class="pin-btn !text-xs !text-red-600 !bg-red-50 !border-red-300">C</button>
+                        <button onclick="pressPin('0', this)" class="pin-btn">0</button>
+                        <button onclick="deletePin()" class="pin-btn !text-xs !text-slate-600 !bg-slate-100 !border-slate-300"><i class="fa-solid fa-delete-left"></i></button>
                     </div>
 
-                    <div id="login-error-msg" class="text-center text-xs text-red-500 font-bold hidden animate-bounce">
+                    <div id="login-error-msg" class="text-center text-xs text-red-600 font-extrabold hidden animate-bounce">
                         ❌ รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
                     </div>
                 </div>
@@ -145,54 +176,62 @@
 
     <!-- ==================== 2. MAIN HEADER & APP CONTENT ==================== -->
     <div id="main-app-container">
-        <header id="main-header" class="bg-gradient-to-r from-[#0D2D26] via-[#134035] to-[#1B5E4E] text-white shadow-lg sticky top-0 z-50 border-b border-[#25856F]">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
-                        <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
+        <header id="main-header" class="glass-panel sticky top-0 z-50 border-b border-[#10B981]/40 py-4 px-4 md:px-8 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="bg-[#06241C]/90 border border-[#10B981]/40 rounded-2xl px-6 py-3.5 flex items-center gap-5 w-full md:w-auto shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                    <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full ring-2 ring-[#10B981] shadow-[0_0_15px_#10B981]">
+                        <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <h1 class="text-2xl font-black tracking-wider text-[#A7F3D0] flex items-center gap-2">
-                            K-MART <span class="text-xs bg-[#10B981] text-white px-2 py-0.5 rounded-full font-medium">v5.0</span>
+                        <h1 class="text-2xl font-black tracking-wider text-white flex items-center gap-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]">
+                            K-MART <span class="text-[11px] bg-gradient-to-r from-[#10B981] to-[#059669] text-white px-2.5 py-0.5 rounded-full font-bold shadow">v5.2</span>
                         </h1>
-                        <p class="text-[11px] font-medium tracking-wide text-emerald-100/70">ผู้ช่วยเบิกจ่ายวัสดุ  งานพัสดุกลาง  องค์การบริหารส่วนตำบลข่วงเปา</p>
+                        <p class="text-[11px] font-semibold text-emerald-300/90 mt-0.5">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง องค์การบริหารส่วนตำบลข่วงเปา</p>
                     </div>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <div class="text-left w-full sm:w-auto">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] uppercase tracking-wider text-emerald-300 font-bold">👤 สิทธิ์ผู้ใช้งานปัจจุบัน:</label>
-                            <button onclick="logout()" class="text-[10px] text-red-300 hover:text-white underline"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</button>
-                        </div>
-                        <div id="active-user-badge" class="bg-[#0D2D26] text-emerald-100 text-xs border border-emerald-600 rounded-xl px-3 py-2 font-bold flex items-center justify-between gap-2 shadow-inner">
-                            <span id="active-user-name">นายมิ่งภพ ศรีชะบา</span>
-                            <button id="btn-admin-store-trigger" onclick="openAdminStoreModal()" class="hidden bg-[#10B981] hover:bg-[#059669] text-white text-[10px] px-2 py-1 rounded-lg font-bold transition">
-                                ⚙️ จัดการคลังพัสดุ & บันทึกบิล
-                            </button>
-                        </div>
+                <div class="bg-[#06241C]/90 border border-[#10B981]/40 rounded-2xl p-3.5 w-full md:w-[320px] shadow-[0_0_15px_rgba(16,185,129,0.15)] flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[10px] text-emerald-300 font-extrabold flex items-center gap-1 uppercase tracking-wider">
+                            <i class="fa-solid fa-user-shield text-[#34D399]"></i> สิทธิ์ผู้ใช้งานปัจจุบัน:
+                        </span>
+                        <button onclick="logout()" class="text-[10px] text-red-400 hover:text-red-300 underline font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                        </button>
                     </div>
-                    <div class="bg-[#0F352E]/90 px-4 py-3 rounded-2xl border border-emerald-600/50 min-w-[240px] shadow-md">
-                        <p class="text-[10px] uppercase tracking-widest text-emerald-300 font-black mb-1.5 text-center"><i class="fa-solid fa-wallet mr-1"></i> โควตางบวัสดุคงเหลือ (บาท THB)</p>
-                        <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-white" id="live-sub-wallets"></div>
+                    <div id="active-user-badge" class="bg-[#02120E] text-emerald-100 text-xs border border-emerald-600/60 rounded-xl px-3.5 py-2 font-bold flex items-center justify-between gap-2 shadow-inner">
+                        <span id="active-user-name" class="truncate">นายมิ่งภพ ศรีชะบา (สำนักปลัด)</span>
+                        <button id="btn-admin-store-trigger" onclick="openAdminStoreModal()" class="hidden neon-glow-btn text-white text-[10px] px-2.5 py-1 rounded-lg font-bold transition flex-shrink-0">
+                            ⚙️ จัดการคลังพัสดุ
+                        </button>
                     </div>
                 </div>
+
+                <div class="bg-[#06241C]/90 border border-[#10B981]/40 rounded-2xl p-3.5 w-full md:w-[300px] shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                    <p class="text-[11px] font-extrabold text-[#34D399] mb-2 flex items-center gap-1.5 border-b border-emerald-800/80 pb-1 uppercase tracking-wider">
+                        <i class="fa-solid fa-wallet text-[#10B981]"></i> โควตางบวัสดุคงเหลือ (บาท THB)
+                    </p>
+                    <div class="grid grid-cols-1 gap-y-1 text-xs text-white" id="live-sub-wallets"></div>
+                </div>
+
             </div>
         </header>
 
-        <main id="main-content" class="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <main id="main-content" class="max-w-[1400px] mx-auto px-4 md:px-8 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-6">
-                <div class="cyber-card p-6 rounded-3xl space-y-4">
-                    <h2 class="text-xs uppercase tracking-widest font-black text-emerald-800 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-bar text-base text-[#10B981]"></i> สรุปงบประมาณพัสดุคงเหลือบาทจริง ทุกกองงาน
+                
+                <div class="glass-panel p-5 rounded-3xl space-y-3">
+                    <h2 class="text-xs uppercase tracking-widest font-black text-[#34D399] flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-base text-[#10B981]"></i> สรุปงบประมาณพัสดุคงเหลือบาทจริง ทุกกองงาน
                     </h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center" id="division-budget-panel"></div>
                 </div>
 
-                <div class="cyber-card p-4 rounded-2xl flex items-center">
+                <div class="glass-panel p-3.5 rounded-2xl flex items-center">
                     <div class="relative w-full">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-[#10B981] text-sm"></i>
-                        <input type="text" id="search-input" onkeyup="filterItems()" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหาพัสดุ..." class="w-full pl-12 pr-4 py-2.5 bg-white text-xs text-slate-700 rounded-xl border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-[#10B981] transition-all shadow-inner">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-[#34D399] text-sm"></i>
+                        <input type="text" id="search-input" onkeyup="filterItems()" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหาพัสดุ..." class="w-full pl-12 pr-4 py-2.5 bg-[#031711] text-xs text-emerald-100 rounded-xl border border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-[#10B981] transition-all shadow-inner placeholder-emerald-700 font-semibold">
                     </div>
                 </div>
                 
@@ -200,56 +239,53 @@
             </div>
 
             <div class="lg:col-span-1">
-                <div class="cyber-card p-6 rounded-3xl sticky top-24 space-y-6">
-                    <div class="flex justify-between items-center border-b pb-4 border-emerald-100">
-                        <h2 class="text-xs uppercase tracking-widest font-black text-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-basket-shopping text-base text-[#10B981]"></i> รายการรอเบิก / SHOPPING CART
+                <div class="glass-panel p-6 rounded-3xl sticky top-28 space-y-5 text-slate-800 bg-white/95">
+                    <div class="flex justify-between items-center border-b pb-3 border-emerald-100 cursor-pointer hover:opacity-80 transition" onclick="openCartModal()">
+                        <h2 class="text-xs uppercase tracking-widest font-black text-emerald-950 flex items-center gap-2">
+                            <i class="fa-solid fa-cart-shopping text-base text-[#10B981]"></i> รายการรอเบิก / SHOPPING CART
                         </h2>
-                        <span id="cart-count" class="bg-[#10B981] text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 ITEM</span>
+                        <span id="cart-count" class="neon-glow-btn text-white text-[10px] font-bold px-3 py-1 rounded-full shadow">0 ITEM</span>
                     </div>
                     
-                    <div id="cart-items" class="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs text-slate-400 italic font-light">
-                        ไม่มีรายการพัสดุในตะกร้าของคุณ
+                    <div id="cart-items" onclick="openCartModal()" class="space-y-3 max-h-48 overflow-y-auto pr-1 text-xs text-slate-400 italic font-light cursor-pointer">
+                        ไม่มีรายการพัสดุในตะกร้าของคุณ (คลิกเพื่อดูรายละเอียด)
                     </div>
                     
-                    <div class="border-t pt-4 border-emerald-100 space-y-1 text-xs">
-                        <div class="flex justify-between tracking-wide font-bold text-slate-700">
+                    <div class="border-t pt-3 border-emerald-100 space-y-1 text-xs">
+                        <div class="flex justify-between tracking-wide font-bold text-slate-800">
                             <span>มูลค่ารวมเบิกสุทธิ (FIFO):</span>
-                            <span class="text-xl font-black text-[#10B981]"><span id="cart-total">0.00</span> บาท</span>
+                            <span class="text-xl font-black text-[#059669]"><span id="cart-total">0.00</span> บาท</span>
                         </div>
-                        <div id="wallet-warning" class="text-[10px] text-red-500 font-bold tracking-wide hidden animate-pulse">⚠️ แจ้งเตือน: งบโควตาพัสดุประเภทนี้ไม่เพียงพอ!</div>
+                        <div id="wallet-warning" class="text-[10px] text-red-600 font-extrabold tracking-wide hidden animate-pulse">⚠️ แจ้งเตือน: งบโควตาพัสดุประเภทนี้ไม่เพียงพอ!</div>
                     </div>
 
-                    <div class="bg-[#F4F9F6] p-4 rounded-2xl border border-emerald-100 text-[11px] space-y-3">
-                        <p class="font-bold text-emerald-900 tracking-wider uppercase text-[10px] flex items-center gap-1">
+                    <div class="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200 text-[11px] space-y-2.5">
+                        <p class="font-black text-emerald-950 tracking-wider uppercase text-[10px] flex items-center gap-1">
                             <i class="fa-solid fa-square-check text-[#10B981]"></i> ลำดับสถานะสายงานอนุมัติเอกสาร:
                         </p>
-                        <div class="space-y-2 text-xs font-semibold">
-                            <button id="btn-approve-1" onclick="triggerStamp(1)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
-                                <span>1. ยื่นขอเบิก (<span id="flow-requester" class="font-bold text-emerald-300"></span>)</span> <span id="status-approve-1" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">ขอเบิก</span>
+                        <div class="space-y-2 text-xs font-bold">
+                            <!-- ขั้นตอนที่ 1: ผู้ขอเบิก -->
+                            <button id="btn-approve-1" onclick="triggerStamp(1)" class="w-full bg-[#0D382C] hover:bg-[#134D3D] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>1. ผู้ขอเบิก (<span id="flow-requester" class="font-bold text-[#6EE7B7]"></span>)</span> <span id="status-approve-1" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">ขอเบิก</span>
                             </button>
-                            <button id="btn-approve-2" onclick="triggerStamp(2)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
-                                <span>2. จพง.พัสดุ (นางสมพร ศรีวิทะ)</span> <span id="status-approve-2" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            <!-- ขั้นตอนที่ 2: เจ้าหน้าที่พัสดุ -->
+                            <button id="btn-approve-2" onclick="triggerStamp(2)" class="w-full bg-[#0D382C] hover:bg-[#134D3D] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>2. เจ้าหน้าที่พัสดุ (นางสมพร ศรีวิทะ)</span> <span id="status-approve-2" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
                             </button>
-                            <button id="btn-approve-3" onclick="triggerStamp(3)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
-                                <span>3. ผอ.กองงาน (<span id="flow-head" class="font-bold text-emerald-300"></span>)</span> <span id="status-approve-3" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
-                            </button>
-                            <button id="btn-approve-4" onclick="triggerStamp(4)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
-                                <span>4. ปลัด อบต. (นายมิ่งภพ ศรีชะบา)</span> <span id="status-approve-4" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
-                            </button>
-                            <button id="btn-approve-5" onclick="triggerStamp(5)" class="w-full bg-[#1F4138] hover:bg-[#285348] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
-                                <span>5. นายก อบต. (นายรุ่งสุริยา เชียงชีระ)</span> <span id="status-approve-5" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
+                            <!-- ขั้นตอนที่ 3: หัวหน้าเจ้าหน้าที่พัสดุ -->
+                            <button id="btn-approve-3" onclick="triggerStamp(3)" class="w-full bg-[#0D382C] hover:bg-[#134D3D] text-white py-2 px-3 rounded-xl flex justify-between items-center transition-all shadow-sm">
+                                <span>3. หัวหน้าเจ้าหน้าที่พัสดุ (นางอุไรวรรณ เครือฟู)</span> <span id="status-approve-3" class="text-[9px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded-lg">รออนุมัติ</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="space-y-4 pt-1">
+                    <div class="space-y-3 pt-1">
                         <div>
-                            <label class="block text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">📌 วัตถุประสงค์โครงการ / งานที่นำไปใช้</label>
-                            <input type="text" id="project-purpose" placeholder="ระบุวัตถุประสงค์การนำวัสดุไปใช้งาน..." class="w-full px-3 py-2 text-xs border border-emerald-100 bg-white rounded-xl focus:ring-2 focus:ring-[#10B981] outline-none text-slate-700 shadow-inner">
+                            <label class="block text-[10px] uppercase tracking-wider font-extrabold text-slate-600 mb-1">📌 วัตถุประสงค์โครงการ / งานที่นำไปใช้</label>
+                            <input type="text" id="project-purpose" placeholder="ระบุวัตถุประสงค์การนำวัสดุไปใช้งาน..." class="w-full px-3 py-2 text-xs border border-emerald-200 bg-emerald-50/30 rounded-xl focus:ring-2 focus:ring-[#10B981] outline-none text-slate-800 font-semibold shadow-inner">
                         </div>
-                        <button onclick="submitOrder()" class="w-full bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white tracking-widest font-bold py-3.5 text-xs rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase">
-                            <i class="fa-solid fa-file-invoice text-[10px]"></i> ประมวลผลใบเบิกและรายงานตัดยอดเงิน
+                        <button onclick="submitOrder()" class="w-full neon-glow-btn text-white tracking-widest font-black py-3.5 text-xs rounded-xl uppercase flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-invoice text-xs"></i> ประมวลผลใบเบิกและรายงานตัดยอดเงิน
                         </button>
                     </div>
                 </div>
@@ -257,133 +293,195 @@
         </main>
     </div>
 
-    <!-- ==================== 4. ADMIN STORE MODAL ==================== -->
-    <div id="admin-store-modal" class="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl border border-emerald-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] p-4 text-white flex justify-between items-center border-b border-[#25856F]">
+    <!-- ==================== 🛒 POPUP CART MODAL ==================== -->
+    <div id="cart-modal" class="fixed inset-0 z-[130] bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="max-w-xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-slate-800">
+            <div class="bg-gradient-to-r from-[#031711] to-[#0A382C] p-4 text-white flex justify-between items-center border-b border-[#10B981]/30">
                 <h3 class="font-bold text-sm text-[#A7F3D0] flex items-center gap-2">
-                    <i class="fa-solid fa-boxes-packing text-[#10B981]"></i> ระบบจัดการคลังพัสดุ & บันทึกบิลจัดซื้อจริง (Admin Store)
+                    <i class="fa-solid fa-basket-shopping text-[#10B981]"></i> รายการพัสดุในตะกร้าของคุณ (Shopping Cart Details)
+                </h3>
+                <button onclick="closeCartModal()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="p-5 overflow-y-auto space-y-3 text-xs flex-1" id="cart-modal-body"></div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">มูลค่าเบิกรวมทั้งสิ้น:</p>
+                    <p class="text-lg font-black text-[#059669]"><span id="cart-modal-total">0.00</span> บาท</p>
+                </div>
+                <button onclick="closeCartModal()" class="neon-glow-btn text-white font-bold px-5 py-2.5 rounded-xl text-xs">
+                    ตกลง / ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 4. ADMIN STORE MODAL ==================== -->
+    <div id="admin-store-modal" class="fixed inset-0 z-[120] bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="max-w-3xl w-full bg-[#07241C] border-2 border-[#10B981]/50 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-[#031711] to-[#0A382C] p-4 text-white flex justify-between items-center border-b border-[#10B981]/30">
+                <h3 class="font-bold text-sm text-[#A7F3D0] flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-packing text-[#10B981]"></i> ระบบจัดการคลังพัสดุ & บันทึกจัดซื้อจริง (Admin Store)
                 </h3>
                 <button onclick="closeAdminStoreModal()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-700">
-                <div class="bg-gradient-to-r from-emerald-900 to-[#134035] p-4 rounded-2xl text-white shadow-lg space-y-3 border border-emerald-500/40">
+            <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-200">
+                
+                <div class="bg-gradient-to-r from-emerald-950 to-[#0A382C] p-4 rounded-2xl text-white shadow-lg space-y-3 border border-emerald-500/40">
                     <div class="flex justify-between items-center">
                         <h4 class="font-bold text-[#A7F3D0] flex items-center gap-2 text-xs">
-                            <i class="fa-solid fa-camera-retro text-lg text-[#10B981]"></i> 📸 ระบบสแกนใบส่งของ/ใบเสร็จรับเงิน อัตโนมัติ (AI Smart OCR)
+                            <i class="fa-solid fa-camera-retro text-lg text-[#34D399]"></i> 📸 ระบบสแกนใบส่งของ/ใบเสร็จรับเงิน อัตโนมัติ (AI Smart OCR)
                         </h4>
                         <span class="text-[9px] bg-[#10B981] text-white px-2 py-0.5 rounded-full font-bold">Gemini Vision AI</span>
                     </div>
-                    <p class="text-[10px] text-emerald-100/80">ถ่ายรูปหรืออัปโหลดภาพใบส่งของจากกองคลัง "น้องกะปิ" จะแกะราคาสินค้า จำนวน และเลขบิลให้อัตโนมัติ!</p>
+                    <p class="text-[10px] text-emerald-200/80">ถ่ายรูปภาพใบส่งของจากกองคลัง "น้องกะปิ" จะแกะราคาสินค้า จำนวน และเลขบิลให้อัตโนมัติ!</p>
                     
                     <div class="flex flex-col sm:flex-row gap-3 items-center pt-1">
                         <input type="file" id="bill-image-input" accept="image/*" class="hidden" onchange="processBillImage(event)">
-                        <button onclick="document.getElementById('bill-image-input').click()" class="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white font-bold px-4 py-2.5 rounded-xl transition shadow flex items-center justify-center gap-2 text-xs">
+                        <button onclick="document.getElementById('bill-image-input').click()" class="w-full sm:w-auto neon-glow-btn text-white font-bold px-4 py-2.5 rounded-xl transition shadow flex items-center justify-center gap-2 text-xs">
                             <i class="fa-solid fa-file-arrow-up"></i> เลือกรูปภาพ / ถ่ายภาพใบส่งของ
                         </button>
-                        <span id="scan-status-text" class="text-[11px] font-bold text-emerald-200"></span>
+                        <span id="scan-status-text" class="text-[11px] font-bold text-emerald-300"></span>
                     </div>
                 </div>
 
-                <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-3">
-                    <h4 class="font-bold text-emerald-900 flex items-center gap-2">
-                        <i class="fa-solid fa-file-circle-plus text-[#10B981]"></i> 1. บันทึกบิลจัดซื้อ / ปรับราคาท้องถิ่น & เพิ่มสต็อก
+                <div class="bg-[#031711] p-4 rounded-2xl border border-emerald-500/30 space-y-3">
+                    <h4 class="font-bold text-[#34D399] flex items-center gap-2 text-xs">
+                        <i class="fa-solid fa-file-invoice-dollar text-base text-[#10B981]"></i> 1. เพิ่ม/จัดซื้อแบบเป็นทางการ (มีใบส่งของ/บิลอ้างอิงราคาจริง)
                     </h4>
+                    <p class="text-[10px] text-slate-400">เลือกรายการพัสดุใน List หรือพิมพ์ชื่อพัสดุใหม่หากไม่อยู่ใน List เพื่อเพิ่มเข้าคลังอย่างเป็นทางการ</p>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="sm:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">เลือกพัสดุที่ต้องการปรับราคา/เพิ่มคลัง:</label>
-                            <select id="admin-select-material" class="w-full bg-white border border-emerald-200 rounded-xl p-2 font-medium"></select>
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">เลือกรายการที่มีใน List หรือเลือก [รายการใหม่ไม่อยู่ใน List]:</label>
+                            <select id="admin-select-material" onchange="toggleFormalNewInput()" class="w-full bg-[#07241C] text-white border border-emerald-500/40 rounded-xl p-2 font-medium"></select>
+                        </div>
+
+                        <div id="formal-new-item-box" class="sm:col-span-2 hidden bg-[#07241C] p-2.5 rounded-xl border border-amber-500/40 space-y-2">
+                            <label class="block text-[10px] font-bold text-amber-300">✨ พิมพ์ชื่อรายการพัสดุใหม่ (นอก List):</label>
+                            <input type="text" id="admin-formal-new-name" placeholder="เช่น กระดาษการ์ดหอม A4 180G" class="w-full bg-[#031711] text-white border border-amber-500/40 rounded-xl p-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[9px] text-slate-300">หมวดหมู่พัสดุ:</label>
+                                    <select id="admin-formal-new-type" class="w-full bg-[#031711] text-white border border-slate-600 rounded-xl p-1.5 text-xs">
+                                        <option value="office">📝 วัสดุสำนักงาน</option>
+                                        <option value="computer">💻 วัสดุคอมพิวเตอร์</option>
+                                        <option value="household">🏠 วัสดุงานบ้านงานครัว</option>
+                                        <option value="other">📦 วัสดุอื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] text-slate-300">รูปภาพพัสดุใหม่:</label>
+                                    <input type="file" accept="image/*" id="admin-formal-img-file" onchange="previewProductImg(event, 'formal-img-preview')" class="text-[10px] text-slate-300">
+                                </div>
+                            </div>
+                            <img id="formal-img-preview" src="" class="w-16 h-16 object-cover rounded-lg border border-amber-400 hidden mt-1">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">ราคาจัดซื้อจริงต่อหน่วย (บาท THB):</label>
+                            <input type="number" id="admin-input-price" step="0.01" placeholder="เช่น 125.00" class="w-full bg-[#07241C] text-emerald-300 border border-emerald-500/40 rounded-xl p-2 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ราคาจัดซื้อจริงต่อหน่วย (บาท THB):</label>
-                            <input type="number" id="admin-input-price" step="0.01" placeholder="เช่น 125.00" class="w-full border border-emerald-200 rounded-xl p-2 font-bold text-emerald-800">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">จำนวนที่รับเข้าคลังเพิ่ม (หน่วย):</label>
-                            <input type="number" id="admin-input-add-qty" placeholder="เช่น 20" class="w-full border border-emerald-200 rounded-xl p-2 font-bold text-emerald-800">
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">จำนวนที่รับเข้าคลังเพิ่ม (หน่วย):</label>
+                            <input type="number" id="admin-input-add-qty" placeholder="เช่น 20" class="w-full bg-[#07241C] text-emerald-300 border border-emerald-500/40 rounded-xl p-2 font-bold">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">เลขที่บิล / อ้างอิงล็อตจัดซื้อ (Lot ID):</label>
-                            <input type="text" id="admin-input-lot-id" placeholder="เช่น LOT-2569-07" class="w-full border border-emerald-200 rounded-xl p-2 font-medium">
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">เลขที่ใบส่งของ / บิลจัดซื้อ (Lot ID อ้างอิง):</label>
+                            <input type="text" id="admin-input-lot-id" placeholder="เช่น INV-2569-0099" class="w-full bg-[#07241C] text-white border border-emerald-500/40 rounded-xl p-2 font-medium">
                         </div>
                     </div>
-                    <button onclick="saveStoreItemUpdate()" class="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2.5 rounded-xl transition shadow">
-                        💾 บันทึกปรับปรุงราคาจริงและเพิ่มสต็อกเข้าคลัง
+                    <button onclick="saveStoreItemUpdate()" class="w-full neon-glow-btn text-white font-bold py-2.5 rounded-xl transition">
+                        💾 บันทึกรับเข้าคลังแบบเป็นทางการ (ผูกเลขบิล)
                     </button>
                 </div>
 
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                    <h4 class="font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-plus-circle text-blue-600"></i> 2. เพิ่มรายการพัสดุชนิดใหม่เข้าคลัง
+                <div class="bg-[#031711] p-4 rounded-2xl border border-blue-500/30 space-y-3">
+                    <h4 class="font-bold text-blue-300 flex items-center gap-2 text-xs">
+                        <i class="fa-solid fa-utensils text-blue-400"></i> 2. เพิ่มสินค้าแบบอิสระ / พัสดุเลี้ยงรับรอง & งานเฉพาะกิจ (พร้อมถ่ายภาพ)
                     </h4>
+                    <p class="text-[10px] text-slate-400">สำหรับสินค้าประเภทอาหารเลี้ยงรับรองประชุม, วัสดุเฉพาะกิจ หรือรายการอิสระที่ไม่บังคับมีบิลอ้างอิง</p>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="sm:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ชื่อรายการพัสดุใหม่:</label>
-                            <input type="text" id="admin-new-name" placeholder="ระบุชื่อพัสดุ..." class="w-full border rounded-xl p-2">
+                            <label class="block text-[10px] font-bold text-slate-300 mb-1">ชื่อรายการสินค้า/พัสดุอิสระ:</label>
+                            <input type="text" id="admin-new-name" placeholder="เช่น ชุดเบรคกาแฟ+ขนมเลี้ยงรับรองคณะตรวจงาน" class="w-full bg-[#07241C] border border-slate-600 rounded-xl p-2 text-white">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ประเภทวัสดุ:</label>
-                            <select id="admin-new-type" class="w-full border rounded-xl p-2">
+                            <label class="block text-[10px] font-bold text-slate-300 mb-1">หมวดหมู่งบประมาณ:</label>
+                            <select id="admin-new-type" class="w-full bg-[#07241C] border border-slate-600 rounded-xl p-2 text-white">
+                                <option value="household">🏠 วัสดุงานบ้านงานครัว / เลี้ยงรับรอง</option>
                                 <option value="office">📝 วัสดุสำนักงาน</option>
                                 <option value="computer">💻 วัสดุคอมพิวเตอร์</option>
-                                <option value="household">🏠 วัสดุงานบ้านงานครัว</option>
-                                <option value="other">📦 วัสดุอื่นๆ</option>
+                                <option value="other">📦 วัสดุอื่นๆ / เฉพาะกิจ</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">ราคาบาทจริง / จำนวนเปิดสต็อก:</label>
+                            <label class="block text-[10px] font-bold text-slate-300 mb-1">ราคาต่อหน่วย (บาท) / จำนวน:</label>
                             <div class="flex gap-2">
-                                <input type="number" id="admin-new-price" placeholder="ราคา" class="w-1/2 border rounded-xl p-2">
-                                <input type="number" id="admin-new-stock" placeholder="จำนวน" class="w-1/2 border rounded-xl p-2">
+                                <input type="number" id="admin-new-price" placeholder="ราคา/หน่วย" class="w-1/2 bg-[#07241C] border border-slate-600 rounded-xl p-2 text-white font-bold">
+                                <input type="number" id="admin-new-stock" placeholder="จำนวน" class="w-1/2 bg-[#07241C] border border-slate-600 rounded-xl p-2 text-white font-bold">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2 bg-[#07241C] p-3 rounded-xl border border-slate-700 space-y-2">
+                            <label class="block text-[10px] font-bold text-blue-200 flex items-center gap-1">
+                                <i class="fa-solid fa-camera text-blue-400"></i> 📸 ถ่ายภาพ หรือเลือกรูปภาพสินค้าอิสระ:
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <input type="file" id="free-product-img-file" accept="image/*" onchange="previewProductImg(event, 'free-img-preview')" class="text-xs text-slate-300">
+                                <img id="free-img-preview" src="" class="w-14 h-14 object-cover rounded-xl border border-blue-400 hidden">
                             </div>
                         </div>
                     </div>
-                    <button onclick="addNewMaterialItem()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition shadow">
-                        ➕ บันทึกเพิ่มรายการพัสดุใหม่
+                    <button onclick="addNewMaterialItem()" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl transition shadow">
+                        ➕ บันทึกเพิ่มสินค้าแบบอิสระเข้าคลัง
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
 
     <!-- ==================== 5. AI BOT WIDGET ==================== -->
     <div class="kapi-bot-float no-print">
-        <button onclick="toggleKapiChat()" class="bg-[#10B981] hover:bg-[#059669] text-white p-3.5 rounded-full shadow-2xl border-2 border-white flex items-center space-x-2 transition transform hover:scale-105">
+        <button onclick="toggleKapiChat()" class="neon-glow-btn text-white p-3.5 rounded-full shadow-2xl border-2 border-white flex items-center space-x-2">
             <i class="fa-solid fa-robot text-xl"></i>
-            <span class="font-bold text-xs hidden sm:inline">ผู้ช่วย "น้องกะปิ" Gemini AI</span>
+            <span class="font-extrabold text-xs hidden sm:inline">ผู้ช่วย "น้องกะปิ" Gemini AI</span>
         </button>
 
-        <div id="kapiChatBox" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-emerald-200 overflow-hidden text-slate-800">
-            <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] text-white p-3.5 flex justify-between items-center border-b border-[#25856F]">
+        <div id="kapiChatBox" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 glass-panel rounded-2xl shadow-2xl border-2 border-emerald-400/50 overflow-hidden text-slate-800">
+            <div class="bg-gradient-to-r from-[#031711] to-[#0A382C] text-white p-3.5 flex justify-between items-center border-b border-[#10B981]/30">
                 <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center text-white font-black text-sm">k</div>
+                    <div class="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center text-white font-black text-sm shadow-[0_0_10px_#10B981]">k</div>
                     <div>
                         <h4 class="font-bold text-xs text-[#A7F3D0]">น้องกะปิ (kapi) Gemini AI</h4>
-                        <p class="text-[10px] text-emerald-200">สมองอัจฉริยะ อบต.ข่วงเปา</p>
+                        <p class="text-[10px] text-emerald-300">สมองอัจฉริยะ อบต.ข่วงเปา</p>
                     </div>
                 </div>
                 <button onclick="toggleKapiChat()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="kapiMessages" class="p-4 h-64 overflow-y-auto text-xs space-y-3 bg-[#F4F9F6]">
-                <div class="bg-white border border-emerald-100 p-2.5 rounded-xl shadow-sm text-slate-700">
+            <div id="kapiMessages" class="p-4 h-64 overflow-y-auto text-xs space-y-3 bg-[#031711]">
+                <div class="bg-[#07241C] border border-emerald-500/30 p-2.5 rounded-xl shadow-sm text-emerald-100">
                     สวัสดีครับท่านปลัดและพี่ๆ เจ้าหน้าที่! ผม <strong>น้องกะปิ (kapi)</strong> พร้อมโต้ตอบและช่วยเหลือครับ!
                 </div>
             </div>
-            <div class="p-2 bg-slate-50 border-t flex flex-wrap gap-1 text-[10px]">
-                <button onclick="askKapi('ขอรหัส PIN เข้าใช้งานหน่อยครับ')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">🔑 ขอรหัส PIN</button>
-                <button onclick="askKapi('ช่วยสอนวิธีเบิกพัสดุอย่างละเอียดหน่อย')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">❓ วิธีเบิกของ</button>
-                <button onclick="askKapi('อธิบายระบบ FIFO ในการบริหารสโตร์ให้ฟังหน่อย')" class="bg-white border border-emerald-200 text-slate-700 px-2 py-1 rounded-lg hover:bg-emerald-50">📦 ระบบ FIFO</button>
+            <div class="p-2 bg-[#051A14] border-t border-emerald-900 flex flex-wrap gap-1 text-[10px]">
+                <button onclick="askKapi('ขอรหัส PIN เข้าใช้งานหน่อยครับ')" class="bg-[#07241C] border border-emerald-600/50 text-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-800">🔑 ขอรหัส PIN</button>
+                <button onclick="askKapi('ช่วยสอนวิธีเบิกพัสดุอย่างละเอียดหน่อย')" class="bg-[#07241C] border border-emerald-600/50 text-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-800">❓ วิธีเบิกของ</button>
+                <button onclick="askKapi('อธิบายระบบ FIFO ในการบริหารสโตร์ให้ฟังหน่อย')" class="bg-[#07241C] border border-emerald-600/50 text-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-800">📦 ระบบ FIFO</button>
             </div>
-            <div class="p-2 bg-white border-t flex items-center space-x-2">
-                <input id="kapiInput" type="text" onkeypress="if(event.key==='Enter') sendKapiMessage()" placeholder="พิมพ์ถามน้องกะปิ..." class="flex-1 border border-emerald-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#10B981]">
-                <button onclick="sendKapiMessage()" class="bg-[#10B981] hover:bg-[#059669] text-white px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="p-2 bg-[#031711] border-t border-emerald-900 flex items-center space-x-2">
+                <input id="kapiInput" type="text" onkeypress="if(event.key==='Enter') sendKapiMessage()" placeholder="พิมพ์ถามน้องกะปิ..." class="flex-1 bg-[#07241C] border border-emerald-500/40 text-white rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#10B981]">
+                <button onclick="sendKapiMessage()" class="neon-glow-btn text-white px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
     <!-- ==================== 6. OFFICIAL DOCUMENT VIEW ==================== -->
-    <div id="official-document-view" class="max-w-4xl mx-auto my-4 p-8 bg-white shadow-2xl rounded-3xl border border-slate-200 hidden print-area">
+    <div id="official-document-view" class="max-w-4xl mx-auto my-4 p-8 bg-white shadow-2xl rounded-3xl border border-slate-200 hidden print-area text-slate-800">
         
         <div class="watermark-container">
             <img src="KPLOGO.jpg" class="watermark-bg" alt="อบต. ลายน้ำ">
@@ -429,40 +527,27 @@
 
             <p class="text-[11px] font-bold text-slate-700 mt-2 text-center">จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ</p>
 
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-6 text-center text-[11px] font-bold border-t pt-4 border-slate-200">
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-y-5 gap-x-6 text-center text-[11px] font-bold border-t pt-4 border-slate-200">
                 <div class="space-y-0.5 flex flex-col items-center">
                     <div id="stamp-box-1" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">ยังไม่ยื่นใบเบิก</div>
-                    <p>ลงชื่อ: ........................................................... (ผู้เบิก)</p>
+                    <p>ลงชื่อ: ....................................... (ผู้เบิก)</p>
                     <p class="text-[10px] text-slate-700 font-bold">( <span id="sign-name-1"></span> )</p>
                     <p class="text-[9px] text-slate-500">ตำแหน่ง: ผู้ขอเบิกพัสดุประจำกองงาน</p>
                 </div>
 
                 <div class="space-y-0.5 flex flex-col items-center">
-                    <div id="stamp-box-3" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
-                    <p>ลงชื่อ: ........................................................... (ผู้เห็นชอบ)</p>
-                    <p class="text-[10px] text-slate-700 font-bold">( <span id="sign-name-3"></span> )</p>
-                    <p class="text-[9px] text-slate-500">ตำแหน่ง: หัวหน้าส่วนราชการ / ผอ.กองงาน</p>
-                </div>
-
-                <div class="space-y-0.5 flex flex-col items-center">
                     <div id="stamp-box-2" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
-                    <p>ลงชื่อ: ........................................................... (ผู้ตรวจสอบ)</p>
+                    <p>ลงชื่อ: ....................................... (ผู้ตรวจสอบ)</p>
                     <p class="text-[10px] text-slate-700 font-bold">( นางสมพร ศรีวิทะ )</p>
                     <p class="text-[9px] text-slate-500">ตำแหน่ง: เจ้าหน้าที่พัสดุ</p>
                 </div>
 
                 <div class="space-y-0.5 flex flex-col items-center">
-                    <div id="stamp-box-4" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-xl px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
-                    <p>ลงชื่อ: ........................................................... (ผู้สั่งจ่ายพัสดุ)</p>
-                    <p class="text-[10px] text-slate-700 font-bold">( นายมิ่งภพ ศรีชะบา )</p>
-                    <p class="text-[9px] text-slate-500">ตำแหน่ง: ปลัดองค์การบริหารส่วนตำบลข่วงเปา</p>
-                </div>
-
-                <div class="sm:col-span-2 space-y-0.5 mt-1 flex flex-col items-center border-t pt-2 border-slate-100">
-                    <div id="stamp-box-5" class="text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-black tracking-widest uppercase mb-0.5">รอดำเนินการอนุมัติ</div>
-                    <p>ลงชื่อ: ........................................................... (ผู้อนุมัติ)</p>
-                    <p class="text-[10px] text-slate-900 font-black">( นายรุ่งสุริยา เชียงชีระ )</p>
-                    <p class="text-[9px] text-emerald-800 font-bold">ตำแหน่ง: นายกองค์การบริหารส่วนตำบลข่วงเปา</p>
+                    <div id="stamp-box-3" class="text-[9px] bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg px-4 py-0.5 font-black uppercase mb-0.5">3. อนุมัติจ่ายพัสดุ</div>
+                    <p class="text-[10px] text-emerald-950 font-bold mb-1">ความเห็นพัสดุ: มีพัสดุในคลังเพียงพอ เห็นควรอนุมัติจ่าย</p>
+                    <p>ลงชื่อ: ....................................... (ผู้อนุมัติ)</p>
+                    <p class="text-[10px] text-slate-900 font-extrabold">( นางอุไรวรรณ เครือฟู )</p>
+                    <p class="text-[9px] text-emerald-800 font-bold">ตำแหน่ง: หัวหน้าเจ้าหน้าที่พัสดุ อบต.ข่วงเปา</p>
                 </div>
             </div>
         </div>
@@ -524,14 +609,14 @@
                 <div class="mt-4 flex flex-col items-center justify-center text-center space-y-0.5 border-t border-emerald-200 pt-3">
                     <p class="text-slate-800 font-bold text-[10px]">ลงนามรับรองความถูกต้องของรายงานโดย</p>
                     <p class="text-xs font-black text-emerald-950 mt-0.5">นางอุไรวรรณ เครือฟู</p>
-                    <p class="text-[9px] text-emerald-700 font-extrabold">( ผู้อำนวยการกองคลัง อบต.ข่วงเปา )</p>
+                    <p class="text-[9px] text-emerald-700 font-extrabold">( ผู้อำนวยการกองคลัง / หัวหน้าเจ้าหน้าที่พัสดุ อบต.ข่วงเปา )</p>
                 </div>
             </div>
 
         </div>
 
         <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4 no-print">
-            <button onclick="window.print()" class="bg-[#10B981] hover:bg-[#059669] text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
+            <button onclick="window.print()" class="neon-glow-btn text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
                 <i class="fa-solid fa-print"></i> พิมพ์ใบเบิกพัสดุ / เซฟเป็น PDF
             </button>
             <button onclick="backToMain()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
@@ -540,15 +625,14 @@
         </div>
     </div>
 
-    <!-- ==================== 7. JAVASCRIPT & ENGINE ==================== -->
+    <!-- ==================== 7. JAVASCRIPT ENGINE ==================== -->
     <script>
-        // 🔑 รหัส API Key ที่แปลงเป็น Base64 แล้ว (เพื่อป้องกันการสแกนจับคีย์จาก GitHub)
         const ENCODED_CENTRAL_KEY = "QVEuQWI4Uk42TEVtc2hEZWFyN09WZ0F5TE9lZFhKVjhGVkNwZTY4LW1mOEk1TlI0eTB4b3c=";
 
         function getDecodedCentralKey() {
             try {
-                if (ENCODED_CENTRAL_KEY && !ENCODED_CENTRAL_KEY.includes("วาง_ENCODED_KEY")) {
-                    return atob(ENCODED_CENTRAL_KEY); // ถอดรหัสคืนกลับเป็น API Key ชั่วคราวในความจำ
+                if (ENCODED_CENTRAL_KEY && !ENCODED_CENTRAL_KEY.includes("QVEuQWI4Uk42TEVtc2hEZWFyN09WZ0F5TE9lZFhKVjhGVkNwZTY4LW1mOEk1TlI0eTB4b3c=")) {
+                    return atob(ENCODED_CENTRAL_KEY);
                 }
             } catch(e) { console.error("Key decoding error", e); }
             return "";
@@ -681,15 +765,15 @@
             }
         };
 
-        const walletNames = { "office": "📝 สำนักงาน", "computer": "💻 คอมพิวเตอร์", "household": "🏠 งานบ้านงานครัว", "other": "📦 อื่นๆ" };
+        const walletNames = { "office": "📝 สำนักงาน:", "computer": "💻 คอมพิวเตอร์:", "household": "🏠 งานบ้านงานครัว:", "other": "📦 อื่นๆ:" };
         let currentUser = {}; let currentDivName = ""; let cart = {};
-        let enteredPin = ""; let approvalStatus = { 1: false, 2: false, 3: false, 4: false, 5: false };
+        let enteredPin = ""; let approvalStatus = { 1: false, 2: false, 3: false };
+        let uploadedProductImageBase64 = "";
 
         function getSavedApiKey() {
             return localStorage.getItem("KPL_CENTRAL_API_KEY") || getDecodedCentralKey();
         }
 
-        // 🟢 ตรวจสอบระบบอัตโนมัติ: ถ้ามีคีย์ส่วนกลางเปิดใช้งานได้ทันที เด้งไป Login
         function checkApiKeyRequirement() {
             const activeKey = getSavedApiKey();
             const setupPage = document.getElementById('api-setup-page');
@@ -727,9 +811,16 @@
 
         function onLoginUserChange() { clearPin(); }
 
-        function pressPin(num) {
+        function pressPin(num, btnElement) {
             if (enteredPin.length < 4) {
-                enteredPin += num; updatePinDots();
+                enteredPin += num; 
+                updatePinDots();
+
+                if (btnElement) {
+                    btnElement.classList.add('active-press');
+                    setTimeout(() => btnElement.classList.remove('active-press'), 150);
+                }
+
                 if (enteredPin.length === 4) { setTimeout(validatePin, 200); }
             }
         }
@@ -743,8 +834,11 @@
         function updatePinDots() {
             for (let i = 1; i <= 4; i++) {
                 const dot = document.getElementById(`pin-dot-${i}`);
-                if (i <= enteredPin.length) dot.classList.add('bg-[#10B981]', 'shadow-md');
-                else dot.classList.remove('bg-[#10B981]', 'shadow-md');
+                if (i <= enteredPin.length) {
+                    dot.classList.add('pin-dot-filled');
+                } else {
+                    dot.classList.remove('pin-dot-filled');
+                }
             }
         }
 
@@ -763,7 +857,6 @@
 
                 document.getElementById('active-user-name').innerText = `${currentUser.name} (${currentDivName})`;
                 document.getElementById('flow-requester').innerText = currentUser.name;
-                document.getElementById('flow-head').innerText = personnelData.divisions[divName].head;
                 
                 cart = {}; resetApprovals(); updateBudgetDisplay(); updateCartUI(); renderProducts();
             } else {
@@ -797,9 +890,9 @@
                 const liveBalance = wallets[type] - cartCosts[type];
                 if (liveBalance < 0) hasOverdraft = true;
                 walletContainer.innerHTML += `
-                    <div class="flex justify-between w-full text-[11px]">
-                        <span class="opacity-80">${walletNames[type]}:</span>
-                        <span class="font-bold ${liveBalance < 0 ? 'text-red-400 font-extrabold' : 'text-emerald-300'}">${liveBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ฿</span>
+                    <div class="flex justify-between items-center w-full text-[11px] py-0.5 border-b border-emerald-900/40">
+                        <span class="opacity-90 font-semibold text-emerald-100">${walletNames[type]}</span>
+                        <span class="font-bold ${liveBalance < 0 ? 'text-red-400 font-extrabold animate-pulse' : 'text-[#6EE7B7] drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]'}">${liveBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ฿</span>
                     </div>`;
             });
             const warning = document.getElementById('wallet-warning');
@@ -813,11 +906,11 @@
                 const divData = personnelData.divisions[name];
                 let totalBudget = Object.values(divData.sub_wallets).reduce((a, b) => a + b, 0);
                 if (name === currentDivName) totalBudget -= getCartTotalCost();
-                const isCurrent = (name === currentDivName) ? 'border-[#10B981] bg-emerald-50/50 shadow-sm font-bold' : 'border-slate-200 bg-white';
+                const isCurrent = (name === currentDivName) ? 'border-2 border-[#10B981] bg-[#07241C] shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'border border-emerald-900/50 bg-[#031711] opacity-80';
                 panel.innerHTML += `
-                    <div class="p-3 border rounded-2xl text-left transition-all ${isCurrent}">
-                        <p class="text-[10px] text-slate-400 truncate">${name}</p>
-                        <p class="text-xs font-black text-emerald-800 mt-0.5">${totalBudget.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</p>
+                    <div class="p-3 rounded-2xl text-left transition-all ${isCurrent}">
+                        <p class="text-[10px] text-emerald-300 font-bold truncate">${name}</p>
+                        <p class="text-xs font-black text-white mt-0.5 drop-shadow">${totalBudget.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</p>
                     </div>`;
             });
         }
@@ -829,28 +922,28 @@
                 const qtyInCart = cart[p.item_id] || 0;
                 const currentSelectionQty = qtyInCart > 0 ? qtyInCart : 1;
                 const card = document.createElement('div');
-                card.className = "cyber-card rounded-2xl p-5 flex flex-col justify-between hover:scale-[1.01] transition-all bg-white";
+                card.className = "glass-card rounded-2xl p-5 flex flex-col justify-between";
                 card.innerHTML = `
                     <div>
-                        <div class="w-full h-36 bg-slate-50 rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100 overflow-hidden">
+                        <div class="w-full h-36 bg-slate-50 rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100 overflow-hidden shadow-inner">
                             <img src="${p.image_url}" onerror="this.src='https://placehold.co/150?text=📦'" class="object-cover h-full w-full rounded-lg">
                         </div>
-                        <span class="text-[9px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md inline-block mb-1">${walletNames[p.type]}</span>
-                        <h3 class="font-bold text-slate-800 text-xs h-8 line-clamp-2">${p.item_name}</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">สต็อกคลัง FIFO: <span class="font-bold text-emerald-600">${p.stock_remaining} หน่วย</span></p>
+                        <span class="text-[9px] bg-emerald-100 text-emerald-900 font-black px-2.5 py-0.5 rounded-md inline-block mb-1 shadow-sm">${walletNames[p.type]}</span>
+                        <h3 class="font-extrabold text-slate-800 text-xs h-8 line-clamp-2">${p.item_name}</h3>
+                        <p class="text-[10px] text-slate-400 mt-1 font-semibold">สต็อกคลัง FIFO: <span class="font-bold text-emerald-600">${p.stock_remaining} หน่วย</span></p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
                         <div class="flex justify-between items-center mb-2 text-xs">
-                            <span class="text-slate-400 font-light">ราคาเบิกจริง:</span>
-                            <span class="font-black text-emerald-600">${p.price_unit_coin.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</span>
+                            <span class="text-slate-500 font-bold">ราคาเบิกจริง:</span>
+                            <span class="font-black text-[#059669] text-sm">${p.price_unit_coin.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</span>
                         </div>
                         <div class="flex gap-2">
-                            <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50 px-2">
-                                <button onclick="changeQty('${p.item_id}', -1)" class="px-1 text-slate-400 font-bold">-</button>
-                                <span id="qty-${p.item_id}" class="w-6 text-center text-xs font-bold">${currentSelectionQty}</span>
-                                <button onclick="changeQty('${p.item_id}', 1)" class="px-1 text-slate-400 font-bold">+</button>
+                            <div class="flex items-center border-2 border-emerald-200 rounded-xl bg-slate-50 px-2 shadow-inner">
+                                <button onclick="changeQty('${p.item_id}', -1)" class="px-1 text-emerald-800 font-black">-</button>
+                                <span id="qty-${p.item_id}" class="w-6 text-center text-xs font-black text-slate-800">${currentSelectionQty}</span>
+                                <button onclick="changeQty('${p.item_id}', 1)" class="px-1 text-emerald-800 font-black">+</button>
                             </div>
-                            <button onclick="addToCart('${p.item_id}')" class="flex-1 bg-[#10B981] text-white hover:bg-[#059669] rounded-xl text-[11px] font-bold py-2 transition-all shadow-sm">
+                            <button onclick="addToCart('${p.item_id}')" class="flex-1 neon-glow-btn text-white rounded-xl text-[11px] font-black py-2 uppercase tracking-wider">
                                 <i class="fa-solid fa-plus text-[9px]"></i> เบิกพัสดุ
                             </button>
                         </div>
@@ -901,24 +994,96 @@
                 total += subtotal; itemCount += qty;
 
                 const itemRow = document.createElement('div');
-                itemRow.className = "flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 text-xs shadow-sm";
+                itemRow.className = "flex justify-between items-center bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-200 text-xs shadow-sm hover:bg-emerald-100/50 transition";
                 itemRow.innerHTML = `
                     <div>
-                        <p class="font-bold text-slate-700">${item.item_name}</p>
-                        <span class="text-[10px] text-slate-400">${walletNames[item.type]} • ${item.price_unit_coin} ฿ x ${qty}</span>
+                        <p class="font-extrabold text-slate-800">${item.item_name}</p>
+                        <span class="text-[10px] text-slate-500 font-bold">${walletNames[item.type]} • ${item.price_unit_coin} ฿ x ${qty}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="font-black text-emerald-600">${subtotal.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</span>
-                        <button onclick="removeFromCart('${id}')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        <span class="font-black text-[#059669]">${subtotal.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</span>
+                        <button onclick="event.stopPropagation(); removeFromCart('${id}')" class="text-slate-400 hover:text-red-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
                     </div>`;
                 container.appendChild(itemRow);
             });
-            if (itemCount === 0) container.innerHTML = 'ไม่มีรายการพัสดุในตะกร้าของคุณ';
+            if (itemCount === 0) container.innerHTML = 'ไม่มีรายการพัสดุในตะกร้าของคุณ (คลิกเพื่อดูรายละเอียด)';
             totalSpan.innerText = total.toLocaleString(undefined, {minimumFractionDigits:2}); countSpan.innerText = `${itemCount} ITEM`;
             updateBudgetDisplay();
+            if(!document.getElementById('cart-modal').classList.contains('hidden')) { renderCartModalItems(); }
         }
 
         function removeFromCart(id) { delete cart[id]; updateCartUI(); renderProducts(); }
+
+        function openCartModal() {
+            const modal = document.getElementById('cart-modal');
+            renderCartModalItems();
+            modal.classList.remove('hidden');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function renderCartModalItems() {
+            const container = document.getElementById('cart-modal-body');
+            const modalTotal = document.getElementById('cart-modal-total');
+            const currentMaterials = getCurrentDivMaterials();
+            container.innerHTML = '';
+            let total = 0;
+
+            if (Object.keys(cart).length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-2 text-slate-300"></i>
+                        <p class="font-bold">ตะกร้าของคุณยังไม่มีพัสดุ</p>
+                        <p class="text-[10px]">เลือกรายการพัสดุจากหน้าหลักเพื่อนำลงตะกร้า</p>
+                    </div>`;
+                modalTotal.innerText = "0.00";
+                return;
+            }
+
+            Object.keys(cart).forEach(id => {
+                const item = currentMaterials.find(p => p.item_id === id);
+                const qty = cart[id];
+                const subtotal = item.price_unit_coin * qty;
+                total += subtotal;
+
+                const card = document.createElement('div');
+                card.className = "flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm";
+                card.innerHTML = `
+                    <div class="w-14 h-14 bg-white border rounded-xl overflow-hidden flex-shrink-0 p-1">
+                        <img src="${item.image_url}" onerror="this.src='https://placehold.co/100?text=📦'" class="w-full h-full object-cover rounded-lg">
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-[8px] bg-emerald-100 text-emerald-900 font-extrabold px-2 py-0.5 rounded">${walletNames[item.type]}</span>
+                        <h4 class="font-extrabold text-slate-800 text-xs mt-0.5">${item.item_name}</h4>
+                        <p class="text-[10px] text-slate-500 font-bold">ราคาหน่วยละ: ${item.price_unit_coin.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <span class="font-black text-[#059669] text-xs">${subtotal.toLocaleString(undefined, {minimumFractionDigits:2})} ฿</span>
+                        <div class="flex items-center border border-emerald-300 rounded-lg bg-white px-1 shadow-inner">
+                            <button onclick="changeModalQty('${id}', -1)" class="px-1.5 text-emerald-800 font-black">-</button>
+                            <span class="w-5 text-center text-xs font-black text-slate-800">${qty}</span>
+                            <button onclick="changeModalQty('${id}', 1)" class="px-1.5 text-emerald-800 font-black">+</button>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart('${id}')" class="text-slate-400 hover:text-red-500 p-1 ml-1"><i class="fa-solid fa-trash-can"></i></button>`;
+                container.appendChild(card);
+            });
+
+            modalTotal.innerText = total.toLocaleString(undefined, {minimumFractionDigits:2});
+        }
+
+        function changeModalQty(id, change) {
+            const currentMaterials = getCurrentDivMaterials();
+            const item = currentMaterials.find(p => p.item_id === id);
+            let currentSelection = cart[id] || 1;
+            let targetQty = currentSelection + change;
+            if (targetQty < 1 || targetQty > item.stock_remaining) return;
+            cart[id] = targetQty;
+            updateCartUI();
+            renderProducts();
+        }
 
         function filterItems() {
             const query = document.getElementById('search-input').value.toLowerCase();
@@ -935,7 +1100,7 @@
         function openAdminStoreModal() {
             const modal = document.getElementById('admin-store-modal');
             const select = document.getElementById('admin-select-material');
-            select.innerHTML = '';
+            select.innerHTML = '<option value="NEW_ITEM">✨ + [เพิ่มรายการใหม่ไม่อยู่ใน List]</option>';
             
             const currentMaterials = getCurrentDivMaterials();
             currentMaterials.forEach(p => {
@@ -945,26 +1110,73 @@
                 select.appendChild(opt);
             });
 
-            document.getElementById('admin-input-lot-id').value = "LOT-" + new Date().getFullYear() + "-" + (new Date().getMonth()+1);
+            document.getElementById('admin-input-lot-id').value = "INV-2569-" + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('scan-status-text').innerText = "";
+            toggleFormalNewInput();
             modal.classList.remove('hidden');
         }
 
         function closeAdminStoreModal() { document.getElementById('admin-store-modal').classList.add('hidden'); }
 
+        function toggleFormalNewInput() {
+            const selectVal = document.getElementById('admin-select-material').value;
+            const newBox = document.getElementById('formal-new-item-box');
+            if (selectVal === "NEW_ITEM") {
+                newBox.classList.remove('hidden');
+            } else {
+                newBox.classList.add('hidden');
+            }
+        }
+
+        function previewProductImg(event, previewId) {
+            const file = event.target.files[0];
+            const previewImg = document.getElementById(previewId);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('hidden');
+                    uploadedProductImageBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function saveStoreItemUpdate() {
-            const itemId = document.getElementById('admin-select-material').value;
+            const selectVal = document.getElementById('admin-select-material').value;
             const newPrice = parseFloat(document.getElementById('admin-input-price').value);
             const addQty = parseInt(document.getElementById('admin-input-add-qty').value);
+            const lotId = document.getElementById('admin-input-lot-id').value;
             const currentMaterials = getCurrentDivMaterials();
-            const item = currentMaterials.find(p => p.item_id === itemId);
 
-            if (item) {
-                if (!isNaN(newPrice) && newPrice > 0) item.price_unit_coin = newPrice;
-                if (!isNaN(addQty) && addQty > 0) item.stock_remaining += addQty;
-                alert(`✅ บันทึกปรับปรุงข้อมูล ${item.item_name} สำเร็จเรียบร้อย!`);
-                closeAdminStoreModal(); renderProducts();
+            if (isNaN(newPrice) || newPrice <= 0 || isNaN(addQty) || addQty <= 0) {
+                alert("❌ กรุณาระบุราคาจัดซื้อและจำนวนสินค้าที่เพิ่มเข้าคลังให้ถูกต้อง");
+                return;
             }
+
+            if (selectVal === "NEW_ITEM") {
+                const newName = document.getElementById('admin-formal-new-name').value;
+                const newType = document.getElementById('admin-formal-new-type').value;
+                if (!newName.trim()) { alert("❌ กรุณาพิมพ์ชื่อพัสดุรายการใหม่ด้วยครับ"); return; }
+
+                const newItemId = "FORMAL-" + (currentMaterials.length + 1);
+                const imgUrl = uploadedProductImageBase64 || "products/paper-a4.jpg";
+
+                currentMaterials.push({
+                    item_id: newItemId, item_name: `${newName} (บิล: ${lotId})`, price_unit_coin: newPrice,
+                    stock_remaining: addQty, image_url: imgUrl, type: newType
+                });
+                alert(`✅ บันทึกพัสดุใหม่แบบเป็นทางการ [${newName}] จำนวน ${addQty} หน่วย (เลขบิล ${lotId}) สำเร็จ!`);
+            } else {
+                const item = currentMaterials.find(p => p.item_id === selectVal);
+                if (item) {
+                    item.price_unit_coin = newPrice;
+                    item.stock_remaining += addQty;
+                    alert(`✅ อัปเดตสต็อก [${item.item_name}] เพิ่ม ${addQty} หน่วย (ปรับราคาเป็น ${newPrice} ฿) สำเร็จ!`);
+                }
+            }
+
+            closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
 
         function addNewMaterialItem() {
@@ -974,19 +1186,20 @@
             const stock = parseInt(document.getElementById('admin-new-stock').value);
 
             if (!name.trim() || isNaN(price) || isNaN(stock)) {
-                alert("❌ กรุณากรอกข้อมูลรายการใหม่ให้ครบถ้วน"); return;
+                alert("❌ กรุณากรอกชื่อสินค้าอิสระ ราคา และจำนวนให้ครบถ้วน"); return;
             }
 
             const currentMaterials = getCurrentDivMaterials();
-            const newItemId = "NEW-OFF-" + (currentMaterials.length + 1);
+            const newItemId = "FREE-ITEM-" + (currentMaterials.length + 1);
+            const imgUrl = uploadedProductImageBase64 || "https://placehold.co/150?text=🍱+อาหาร/พัสดุอิสระ";
             
             currentMaterials.push({
                 item_id: newItemId, item_name: name, price_unit_coin: price,
-                stock_remaining: stock, image_url: "products/paper-a4.jpg", type: type
+                stock_remaining: stock, image_url: imgUrl, type: type
             });
 
-            alert(`✅ บันทึกพัสดุรายการใหม่ [${name}] เข้าสู่คลัง ${currentDivName} สำเร็จ!`);
-            closeAdminStoreModal(); renderProducts();
+            alert(`✅ บันทึกสินค้าอิสระ [${name}] เข้าคลัง ${currentDivName} สำเร็จ!`);
+            closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
 
         function triggerStamp(id) {
@@ -997,7 +1210,7 @@
             
             if (approvalStatus[id]) {
                 btnSpan.innerText = id === 1 ? "เสนอแล้ว" : "✓ อนุมัติ";
-                btnSpan.className = "text-[9px] bg-emerald-400 text-emerald-950 font-black px-2 py-0.5 rounded-lg";
+                btnSpan.className = "text-[9px] bg-[#34D399] text-[#031711] font-black px-2 py-0.5 rounded-lg shadow";
                 stampBox.innerText = `✓ อนุมัติลงนามเรียบร้อย (${now})`;
                 stampBox.className = "text-[9px] font-bold bg-emerald-500 text-white border border-emerald-400 rounded-lg px-3 py-1 uppercase mb-0.5 shadow-sm";
             } else {
@@ -1009,7 +1222,7 @@
         }
 
         function resetApprovals() {
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 3; i++) {
                 approvalStatus[i] = false;
                 const btnSpan = document.getElementById(`status-approve-${i}`);
                 const stampBox = document.getElementById(`stamp-box-${i}`);
@@ -1028,15 +1241,15 @@
 
         async function askKapi(query) {
             const messages = document.getElementById("kapiMessages");
-            messages.innerHTML += `<div class="text-right"><span class="bg-emerald-100 text-emerald-900 p-2 rounded-xl inline-block my-1 shadow-sm font-medium">${query}</span></div>`;
+            messages.innerHTML += `<div class="text-right"><span class="bg-[#10B981] text-white p-2.5 rounded-xl inline-block my-1 shadow font-semibold">${query}</span></div>`;
             const loadingId = "kapi-loading-" + Date.now();
-            messages.innerHTML += `<div id="${loadingId}" class="text-left"><span class="bg-white border border-emerald-100 text-slate-400 p-2 rounded-xl inline-block my-1 shadow-sm animate-pulse">🤖 น้องกะปิ กำลังประมวลผล...</span></div>`;
+            messages.innerHTML += `<div id="${loadingId}" class="text-left"><span class="bg-[#07241C] border border-emerald-500/40 text-emerald-300 p-2.5 rounded-xl inline-block my-1 shadow animate-pulse">🤖 น้องกะปิ กำลังประมวลผล...</span></div>`;
             messages.scrollTop = messages.scrollHeight;
 
             const apiKeyClean = getSavedApiKey() ? getSavedApiKey().trim() : "";
             if (!apiKeyClean) {
                 document.getElementById(loadingId).remove();
-                messages.innerHTML += `<div class="text-left"><span class="bg-amber-50 border border-amber-200 text-amber-800 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> ไม่พบรหัส API Key ส่วนกลางในเครื่องนี้ กรุณารีเฟรชเพื่อตั้งค่าใหม่ครับ</span></div>`;
+                messages.innerHTML += `<div class="text-left"><span class="bg-amber-950/80 border border-amber-500/50 text-amber-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> ไม่พบรหัส API Key ส่วนกลางในเครื่องนี้ กรุณารีเฟรชเพื่อตั้งค่าใหม่ครับ</span></div>`;
                 messages.scrollTop = messages.scrollHeight;
                 return;
             }
@@ -1055,14 +1268,14 @@
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     let reply = data.candidates[0].content.parts[0].text;
                     document.getElementById(loadingId).remove();
-                    messages.innerHTML += `<div class="text-left"><span class="bg-white border border-emerald-100 text-slate-700 p-2 rounded-xl inline-block my-1 shadow-sm leading-relaxed">🤖 <strong>น้องกะปิ:</strong> ${reply.replace(/\n/g, '<br>')}</span></div>`;
+                    messages.innerHTML += `<div class="text-left"><span class="bg-[#07241C] border border-emerald-500/40 text-emerald-100 p-2.5 rounded-xl inline-block my-1 shadow leading-relaxed">🤖 <strong>น้องกะปิ:</strong> ${reply.replace(/\n/g, '<br>')}</span></div>`;
                 } else if (data.error) {
                     document.getElementById(loadingId).remove();
-                    messages.innerHTML += `<div class="text-left"><span class="bg-red-50 text-red-500 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> API แจ้งข้อผิดพลาด: ${data.error.message || 'Key ไม่ได้รับการอนุมัติ'}</span></div>`;
+                    messages.innerHTML += `<div class="text-left"><span class="bg-red-950/80 border border-red-500/50 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> API แจ้งข้อผิดพลาด: ${data.error.message || 'Key ไม่ได้รับการอนุมัติ'}</span></div>`;
                 }
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                messages.innerHTML += `<div class="text-left"><span class="bg-red-50 text-red-500 p-2 rounded-xl inline-block my-1 shadow-sm">🤖 <strong>น้องกะปิ:</strong> การเชื่อมต่อล้มเหลว กรุณาเช็กอินเทอร์เน็ตครับ</span></div>`;
+                messages.innerHTML += `<div class="text-left"><span class="bg-red-950/80 border border-red-500/50 text-red-200 p-2.5 rounded-xl inline-block my-1 shadow">🤖 <strong>น้องกะปิ:</strong> การเชื่อมต่อล้มเหลว กรุณาเช็กอินเทอร์เน็ตครับ</span></div>`;
             }
             messages.scrollTop = messages.scrollHeight;
         }
@@ -1098,7 +1311,7 @@
                         if (parsedData.qty) document.getElementById('admin-input-add-qty').value = parsedData.qty;
                         if (parsedData.lot_id) document.getElementById('admin-input-lot-id').value = parsedData.lot_id;
                         statusText.innerText = "✅ น้องกะปิแกะข้อมูลลงฟอร์มเรียบร้อย!";
-                        alert("✨ น้องกะปิอ่านเอกสารสำเร็จ เติมข้อมูลลงฟอร์มให้เรียบร้อยแล้วครับ");
+                        alert("✨ น้องกะปิอ่านเอกสารสำเร็จ เติมข้อมูลลงฟอร์มให้อัตโนมัติแล้วครับ");
                     }
                 } catch (err) { statusText.innerText = "❌ เกิดข้อผิดพลาดในการสแกน"; }
             };
@@ -1111,12 +1324,23 @@
         }
 
         function submitOrder() {
-            const cartCosts = getCartCostsByType(); const total = getCartTotalCost();
+            const cartCosts = getCartCostsByType(); 
+            const total = getCartTotalCost();
             const purpose = document.getElementById('project-purpose').value;
             const currentMaterials = getCurrentDivMaterials();
-            const walletsBefore = JSON.parse(JSON.stringify(personnelData.divisions[currentDivName].sub_wallets));
 
-            if (total === 0 || !purpose.trim()) { alert("❌ กรุณาเลือกสินค้าและใส่รายละเอียดวัตถุประสงค์ให้ครบถ้วน"); return; }
+            if (total === 0) {
+                alert("⚠️ ท่านปลัดยังไม่ได้เลือกพัสดุลงในตะกร้าครับ!\nกรุณากดปุ่ม '+ เบิกพัสดุ' ที่รายการพัสดุด้านซ้ายก่อนกดประมวลผลครับ");
+                return;
+            }
+
+            if (!purpose.trim()) {
+                alert("⚠️ กรุณาระบุ 'วัตถุประสงค์โครงการ / งานที่นำไปใช้' ก่อนประมวลผลครับ");
+                document.getElementById('project-purpose').focus();
+                return;
+            }
+
+            const walletsBefore = JSON.parse(JSON.stringify(personnelData.divisions[currentDivName].sub_wallets));
 
             Object.keys(cart).forEach(id => {
                 const item = currentMaterials.find(p => p.item_id === id);
@@ -1136,9 +1360,7 @@
             document.getElementById('doc-requester').innerText = `${currentUser.name} (${currentUser.role})`;
             document.getElementById('doc-purpose').innerText = purpose;
             document.getElementById('sign-name-1').innerText = currentUser.name;
-            document.getElementById('sign-name-3').innerText = personnelData.divisions[currentDivName].head;
             document.getElementById('rcpt-div').innerText = currentDivName;
-            
             document.getElementById('pickup-sign-requester').innerText = currentUser.name;
 
             const tBody = document.getElementById('doc-table-body'); tBody.innerHTML = ''; let count = 1;
