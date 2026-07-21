@@ -39,13 +39,11 @@
                 padding: 0 !important; 
                 border: none !important;
             }
-            /* บังคับแยกขึ้นหน้าใหม่แบบแน่นอน */
             .page-break-before { 
                 break-before: page !important; 
                 page-break-before: always !important; 
                 margin-top: 0.5rem !important;
             }
-            /* ปรับแต่งความดันการพิมพ์ */
             .print-compact { padding: 0.5rem !important; }
         }
     </style>
@@ -94,7 +92,6 @@
             <div class="p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-emerald-500/20 bg-gradient-to-b from-black/20 to-transparent text-white">
                 <div>
                     <div class="flex items-center gap-4 mb-4">
-                        <!-- 🟢 ปรับเปลี่ยน: ทำเป็นวงกลมตัดขอบขาวออก -->
                         <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
                             <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
                         </div>
@@ -170,7 +167,6 @@
         <header id="main-header" class="bg-gradient-to-r from-[#0D2D26] via-[#134035] to-[#1B5E4E] text-white shadow-lg sticky top-0 z-50 border-b border-[#25856F]">
             <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <!-- 🟢 ปรับเปลี่ยน: บังคับรูปให้กลายเป็นวงกลมพอดีกับตรา ตัดกรอบสี่เหลี่ยมสีขาวออกเรียบร้อย -->
                     <div class="w-20 h-20 flex items-center justify-center overflow-hidden rounded-full">
                         <img src="KPLOGO.jpg" onerror="this.src='https://placehold.co/100?text=อบต.'" class="w-full h-full object-cover rounded-full">
                     </div>
@@ -408,7 +404,6 @@
     <!-- ==================== 6. OFFICIAL DOCUMENT VIEW (หน้ารายงานผล & ใบเบิก) ==================== -->
     <div id="official-document-view" class="max-w-4xl mx-auto my-4 p-8 bg-white shadow-2xl rounded-3xl border border-slate-200 hidden print-area">
         
-        <!-- 📄 หน้าที่ 1: ใบเบิกพัสดุและสายอนุมัติ 5 ลำดับ -->
         <div class="watermark-container">
             <img src="KPLOGO.jpg" class="watermark-bg" alt="อบต. ลายน้ำ">
             
@@ -491,10 +486,8 @@
             </div>
         </div>
 
-        <!-- 📄 หน้าที่ 2: QR Code, ใบรับ-จ่ายพัสดุ และรายงานคลัง -->
         <div class="page-break-before space-y-4 pt-2">
             
-            <!-- 📲 QR Code สำหรับเจ้าหน้าที่ Store สแกนจ่ายพัสดุ -->
             <div class="bg-gradient-to-r from-[#0D2D26] to-[#134035] p-5 rounded-2xl text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-[#10B981]">
                 <div class="space-y-1.5 text-center md:text-left flex-1">
                     <span class="bg-[#10B981] text-white font-black text-[9px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">STORE PICKUP QR CODE</span>
@@ -511,13 +504,11 @@
                 </div>
             </div>
 
-            <!-- 🖊️ ส่วนลงนามลายมือชื่อ ผู้รับของ และ ผู้จ่ายพัสดุ -->
             <div class="bg-slate-50 p-5 rounded-2xl border border-slate-300 text-[11px] text-slate-800">
                 <h4 class="font-bold text-center text-emerald-900 mb-4 uppercase tracking-wider">
                     <i class="fa-solid fa-pen-nib mr-1 text-[#10B981]"></i> หลักฐานการรับ - จ่ายพัสดุจริง ณ คลังกลาง
                 </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center font-bold">
-                    <!-- ฝั่งผู้รับของ -->
                     <div class="space-y-1 flex flex-col items-center">
                         <p class="text-slate-500 text-[10px] mb-3">ได้รับพัสดุตามรายการข้างต้นถูกต้อง ครบถ้วนแล้ว</p>
                         <p>ลงชื่อ: ........................................................... (ผู้รับของ)</p>
@@ -526,7 +517,6 @@
                         <p class="text-[9px] text-slate-400 font-normal pt-0.5">วันที่ ....... / .................... / ...........</p>
                     </div>
 
-                    <!-- ฝั่งผู้จ่ายของ -->
                     <div class="space-y-1 flex flex-col items-center border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0">
                         <p class="text-slate-500 text-[10px] mb-3">ได้ตรวจสอบและจ่ายพัสดุเรียบร้อยแล้ว</p>
                         <p>ลงชื่อ: ........................................................... (ผู้จ่ายพัสดุ)</p>
@@ -537,7 +527,6 @@
                 </div>
             </div>
 
-            <!-- 🧾 ส่วนใบเสร็จรายงานผลการหักยอดงบประมาณบาทจริง (กองคลัง) -->
             <div class="border border-[#10B981] bg-emerald-50/30 p-5 rounded-2xl relative text-[11px] watermark-container">
                 <img src="KPLOGO.jpg" class="watermark-bg" alt="อบต. ลายน้ำ">
                 <div class="sm:absolute top-3 right-3 bg-[#10B981] text-white font-black text-[8px] px-2.5 py-0.5 rounded-full uppercase tracking-widest text-center mb-2 sm:mb-0">BUDGET REPORT</div>
@@ -560,7 +549,6 @@
 
         </div>
 
-        <!-- ปุ่มควบคุมการพิมพ์ / ย้อนกลับ -->
         <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4 no-print">
             <button onclick="window.print()" class="bg-[#10B981] hover:bg-[#059669] text-white font-bold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all">
                 <i class="fa-solid fa-print"></i> พิมพ์ใบเบิกพัสดุ / เซฟเป็น PDF
@@ -709,12 +697,15 @@
             return localStorage.getItem("KPL_CENTRAL_API_KEY");
         }
 
+        // 🟢 ปรับปรุงระบบตรวจสอบและควบคุมหน้าจอ
         function checkApiKeyRequirement() {
             const savedKey = getSavedApiKey();
+            const setupPage = document.getElementById('api-setup-page');
+            
             if (!savedKey) {
-                document.getElementById('api-setup-page').classList.remove('hidden');
+                setupPage.classList.remove('hidden');
             } else {
-                document.getElementById('api-setup-page').classList.add('hidden');
+                setupPage.classList.add('hidden');
                 initCoverLogin();
             }
         }
@@ -730,8 +721,9 @@
                 { fps: 10, qrbox: { width: 220, height: 220 } },
                 (decodedText) => {
                     document.getElementById('input-setup-api-key').value = decodedText.trim();
+                    // 🟢 สแกนเสร็จ สั่งปิดกล้องแล้วบันทึกเข้าหน้า Login ทันที ไม่ต้องรอให้ผู้ใช้กด
                     stopQRScanner();
-                    alert("✨ สแกน QR Code สำเร็จ! กดปุ่มบันทึกเพื่อเข้าสู่ระบบได้เลยครับ");
+                    saveApiKey();
                 },
                 (errorMessage) => { }
             ).catch(err => {
@@ -750,6 +742,7 @@
             }
         }
 
+        // 🟢 ปรับปรุงการบันทึกคีย์ และเด้งไปหน้า Login ทันทีโดยไม่ค้าง
         function saveApiKey() {
             const keyInput = document.getElementById('input-setup-api-key').value.trim();
             if (!keyInput) {
@@ -757,9 +750,13 @@
                 return;
             }
             localStorage.setItem("KPL_CENTRAL_API_KEY", keyInput);
-            alert("✅ บันทึกรหัส API Key เรียบร้อย!");
+            
+            // ปิดกล้องถ้ายังเปิดอยู่
             stopQRScanner();
-            checkApiKeyRequirement();
+            
+            // ซ่อนหน้าตั้งค่าแล้วข้ามไป Login ทันที
+            document.getElementById('api-setup-page').classList.add('hidden');
+            initCoverLogin();
         }
 
         function clearSavedApiKey() {
@@ -780,6 +777,7 @@
                 });
             });
             clearPin();
+            document.getElementById('login-cover-page').classList.remove('hidden');
         }
 
         function onLoginUserChange() { clearPin(); }
@@ -1177,7 +1175,6 @@
 
             if (total === 0 || !purpose.trim()) { alert("❌ กรุณาเลือกสินค้าและใส่รายละเอียดวัตถุประสงค์ให้ครบถ้วน"); return; }
 
-            // 1. ตัดสต็อกและงบประมาณ
             Object.keys(cart).forEach(id => {
                 const item = currentMaterials.find(p => p.item_id === id);
                 item.stock_remaining -= cart[id];
@@ -1189,7 +1186,6 @@
             const walletsAfter = personnelData.divisions[currentDivName].sub_wallets;
             const recId = "KP-REC-" + new Date().getFullYear() + "/" + Math.floor(1000 + Math.random() * 9000);
 
-            // 2. เติมข้อมูลลงเอกสารรายงาน
             document.getElementById('doc-rec-id').innerText = recId;
             document.getElementById('doc-org-title').innerText = personnelData.organization;
             document.getElementById('doc-date').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " น.";
@@ -1200,7 +1196,6 @@
             document.getElementById('sign-name-3').innerText = personnelData.divisions[currentDivName].head;
             document.getElementById('rcpt-div').innerText = currentDivName;
             
-            // เติมชื่อผู้รับของ
             document.getElementById('pickup-sign-requester').innerText = currentUser.name;
 
             const tBody = document.getElementById('doc-table-body'); tBody.innerHTML = ''; let count = 1;
@@ -1226,7 +1221,6 @@
                 <td class="border border-slate-300 p-1.5 text-right text-emerald-800 font-extrabold">${total.toLocaleString(undefined, {minimumFractionDigits:2})} บาท</td>`;
             tBody.appendChild(totalRow);
 
-            // 3. สร้าง QR Code ผ่าน API
             const qrTextPayload = encodeURIComponent(`Ref: ${recId}\nผู้เบิก: ${currentUser.name}\nสังกัด: ${currentDivName}\nรายการ: ${pickupItemsList.join(', ')}`);
             document.getElementById('store-pickup-qrcode-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrTextPayload}`;
             document.getElementById('qr-data-preview').innerText = `Ref: ${recId} | ${currentUser.name}`;
@@ -1244,7 +1238,6 @@
             });
             document.getElementById('rcpt-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits:2}) + " บาท";
 
-            // 4. สลับแสดงเฉพาะหน้ารายงานผล/ใบเบิก และเลื่อนจอขึ้นบนสุดทันที
             document.getElementById('main-app-container').classList.add('hidden', 'no-print');
             const docView = document.getElementById('official-document-view');
             docView.classList.remove('hidden');
