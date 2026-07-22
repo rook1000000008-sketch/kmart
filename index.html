@@ -6,7 +6,6 @@
     <title>K-MART v5.2 - ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง อบต.ข่วงเปา</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
         
@@ -105,7 +104,7 @@
                             <i class="fa-solid fa-bolt text-3xl text-[#34D399]"></i>
                         </div>
                         <h3 class="font-bold text-sm text-[#A7F3D0] tracking-wide">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง</h3>
-                        <p class="text-[10px] text-emerald-200/80 mt-1">คลังพัสดุ FIFO • เพิ่มสินค้าแบบทางการ/อิสระ • อัปโหลดรูปจริง</p>
+                        <p class="text-[10px] text-emerald-200/80 mt-1">คลังพัสดุ FIFO • ข้อมูลบุคลากรครบถ้วน อบต.ข่วงเปา อ.จอมทอง จ.เชียงใหม่</p>
                     </div>
                 </div>
                 
@@ -117,12 +116,12 @@
             <div class="p-8 flex flex-col justify-center bg-white/95 text-slate-800 backdrop-blur-md">
                 <div class="text-center mb-6">
                     <h3 class="text-xl font-black text-[#0D2D26] tracking-wide"><i class="fa-solid fa-shield-halved text-[#10B981] mr-2"></i>เข้าสู่ระบบปฏิบัติการ</h3>
-                    <p class="text-xs text-slate-500 font-medium">เลือกตำแหน่งและใส่รหัส PIN 4 หลักเพื่อยืนยันตัวตน</p>
+                    <p class="text-xs text-slate-500 font-medium">เลือกชื่อบุคลากรและใส่รหัส PIN 4 หลักเพื่อยืนยันตัวตน</p>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] uppercase font-extrabold text-emerald-900 mb-1 tracking-wider">👤 เลือกตำแหน่ง / ผู้ใช้งาน:</label>
+                        <label class="block text-[10px] uppercase font-extrabold text-emerald-900 mb-1 tracking-wider">👤 เลือกชื่อบุคลากร:</label>
                         <select id="login-user-select" onchange="onLoginUserChange()" class="w-full bg-emerald-50/50 border-2 border-emerald-300 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#10B981]">
                         </select>
                     </div>
@@ -173,7 +172,7 @@
                         <h1 class="text-2xl font-black tracking-wider text-white flex items-center gap-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]">
                             K-MART <span class="text-[11px] bg-gradient-to-r from-[#10B981] to-[#059669] text-white px-2.5 py-0.5 rounded-full font-bold shadow">v5.2</span>
                         </h1>
-                        <p class="text-[11px] font-semibold text-emerald-300/90 mt-0.5">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง องค์การบริหารส่วนตำบลข่วงเปา</p>
+                        <p class="text-[11px] font-semibold text-emerald-300/90 mt-0.5">ผู้ช่วยเบิกจ่ายวัสดุ งานพัสดุกลาง อบต.ข่วงเปา</p>
                     </div>
                 </div>
                 
@@ -613,20 +612,42 @@
 
     <!-- ==================== 7. JAVASCRIPT ENGINE ==================== -->
     <script>
-        // แทนที่ URL ด้านล่างนี้ด้วย URL ของ Cloudflare Worker ที่คุณเพิ่งสร้างขึ้น
         const BACKEND_PROXY_URL = "https://kmart-proxy-api.rook1000000008.workers.dev";
 
         const personnelData = {
             "organization": "องค์การบริหารส่วนตำบลข่วงเปา",
+            "command_period": "ประจำเดือนกรกฎาคม 2569",
+            "mayor": "นายรุ่งสุริยา เชียงชีระ",
             "divisions": {
-                "สำนักปลัด": { 
+                "สำนักปลัด": {
+                    "supervisor": "นายมิ่งภพ ศรีชะบา",
+                    "supervisor_role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นางจิตรลดา นาคะพันธ์ุ",
+                    "head_role": "หัวหน้าสำนักปลัด",
                     "sub_wallets": { "office": 50000.00, "computer": 20000.00, "household": 25000.00, "other": 220000.00 },
-                    "head": "นางจิตรลดา นาคะพันธ์ุ", 
                     "staff": [
-                        {"name": "นายมิ่งภพ ศรีชะบา", "role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา", "pin": "8888", "is_admin": true},
-                        {"name": "นางสาววีรินทร์ภัทร แสงพารารัตน์", "role": "นักวิเคราะห์นโยบายและแผนชำนาญการ", "pin": "1234"},
-                        {"name": "นายสุวัชญ์ศิษฎ์ พุทธเดชากุล", "role": "นิติกรชำนาญการ", "pin": "1234"},
-                        {"name": "นางสาวศรีพูล อุปนันท์", "role": "นักทรัพยากรบุคคคลชำนาญการ", "pin": "1234"}
+                        {"name": "นายมิ่งภพ ศรีชะบา", "role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา", "pin": "8888", "is_admin": true, "task": "ผู้บริหารสูงสุดและกำกับดูแลภาพรวม"},
+                        {"name": "นางพรพิมล คำหล้า", "role": "รองปลัดองค์การบริหารส่วนตำบลข่วงเปา", "pin": "3333", "is_admin": true, "task": "รองปลัด อบต.ข่วงเปา กำกับดูแลงานสาธารณสุขและสวัสดิการ"},
+                        {"name": "นางจิตรลดา นาคะพันธ์ุ", "role": "หัวหน้าสำนักปลัด", "pin": "2222", "is_admin": true, "task": "หัวหน้าสำนักปลัด"},
+                        {"name": "นายสุวัชญ์ศิษฎ์ พุทธเดชากุล", "role": "นิติกรชำนาญการ", "pin": "1234", "task": "ตรวจสอบรายงานผลเรื่องร้องเรียน/ร้องทุกข์ของประชาชน"},
+                        {"name": "นางสาวศรีพูล อุปนันท์", "role": "นักทรัพยากรบุคคคลชำนาญการ", "pin": "1234", "task": "เตรียมข้อมูลประเมินผลการปฏิบัติราชการ รอบที่ 2"},
+                        {"name": "นางสาววีรินทร์ภัทร แสงพารารัตน์", "role": "นักวิเคราะห์นโยบายและแผนชำนาญการ", "pin": "1234", "task": "เร่งจัดทำและตรวจทานร่างข้อบัญญัติงบประมาณรายจ่าย"},
+                        {"name": "นางสาวธัญวรัชญ์ เชี่ยวเจริญโชติ", "role": "เจ้าพนักงานธุรการชำนาญงาน", "pin": "1234", "task": "รวบรวมเอกสาร รายงานเรื่องร้องเรียน และบันทึกข้อมูลระบบ"},
+                        {"name": "นายสราวุธ นิลสุวรรณ์", "role": "เจ้าพนักงานป้องกันชำนาญงาน", "pin": "1234", "task": "หัวหน้าชุดควบคุมและเตรียมความพร้อมบรรเทาสาธารณภัย"},
+                        {"name": "นายทวีชัย ทะสุยะ", "role": "พนักงานสูบน้ำ หมู่ที่ 3", "pin": "1234", "task": "ปฏิบัติงานสูบน้ำและบรรเทาอุทกภัย"},
+                        {"name": "นายนเรศ ตาปัน", "role": "พนักงานสูบน้ำ หมู่ที่ 7", "pin": "1234", "task": "ปฏิบัติงานสูบน้ำและดูแลพื้นที่"},
+                        {"name": "นายวิทยา ศรีจอมแจ้ง", "role": "ผู้ช่วยนักประชาสัมพันธ์", "pin": "1234", "task": "ประชาสัมพันธ์แจ้งเตือนภัยอุทกภัยช่วงฤดูฝน"},
+                        {"name": "นายภาควัฒน์ สมสิงห์คำ", "role": "ผู้ช่วยเจ้าพนักงานป้องกันฯ", "pin": "1234", "task": "สนับสนุนงานป้องกันและบรรเทาสาธารณภัย"},
+                        {"name": "นายณัฐพล กองวิ", "role": "พนักงานดับเพลิง", "pin": "1234", "task": "ปฏิบัติงานดับเพลิงและกู้ภัย"},
+                        {"name": "นายดอน ตันกาวิน", "role": "พนักงานดับเพลิง", "pin": "1234", "task": "ปฏิบัติงานระงับอัคคีภัย"},
+                        {"name": "นายสมศักดิ์ เปงภีระ", "role": "พนักงานขับเครื่องจักรฯ", "pin": "1234", "task": "ขับเครื่องจักรกลและยานพาหนะส่วนกลาง"},
+                        {"name": "นายสรพงศ์ ศรีเปง", "role": "พนักงานสูบน้ำ หมู่ที่ 2", "pin": "1234", "task": "ปฏิบัติงานสูบน้ำประจำพื้นที่"},
+                        {"name": "นางปณิตตา วิระราช", "role": "แม่ครัว", "pin": "1234", "task": "สนับสนุนภารกิจงานครัวและเลี้ยงรับรอง"},
+                        {"name": "นายบุญแก้ว จอมเป็ง", "role": "เจ้าหน้าที่งานป้องกัน", "pin": "1234", "task": "สนับสนุนงานป้องกันและบรรเทาสาธารณภัย"},
+                        {"name": "นายศรัณย์ คำภิโร", "role": "เจ้าหน้าที่ประจำศูนย์สูบน้ำ หมู่ที่ 13", "pin": "1234", "task": "ดูแลศูนย์สูบน้ำและช่วยเหลือประชาชน"},
+                        {"name": "นางสาววิยะดา เป็งภีระ", "role": "เจ้าหน้าที่ธุรการ", "pin": "1234", "task": "สนับสนุนงานสารบรรณและธุรการสำนักปลัด"},
+                        {"name": "นายอนิวรรตน์ พันสุวรรณ", "role": "พนักงานขับรถยนต์", "pin": "1234", "task": "ปฏิบัติงานขับรถยนต์ส่วนกลาง"},
+                        {"name": "นายณัฐพล ดาววี", "role": "เจ้าหน้าที่งานป้องกันและบรรเทาสาธารณภัย", "pin": "1234", "task": "ปฏิบัติงานช่วยเหลือผู้ประสบภัย"}
                     ],
                     "materials": [
                         { "item_id": "BL-OFF-01", "item_name": "กระดาษถ่ายเอกสาร AA 80G A4 (500 แผ่น)", "price_unit_coin": 120.00, "stock_remaining": 10, "image_url": "products/paper-a4.jpg", "type": "office" },
@@ -644,13 +665,25 @@
                         { "item_id": "BL-OFF-13", "item_name": "เครื่องคิดเลข Canon TX-121OHI III", "price_unit_coin": 390.00, "stock_remaining": 4, "image_url": "products/cal.jpg", "type": "office" }
                     ]
                 },
-                "กองคลัง": { 
+                "กองคลัง": {
+                    "supervisor": "นายมิ่งภพ ศรีชะบา",
+                    "supervisor_role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นางอุไรวรรณ เครือฟู",
+                    "head_role": "ผู้อำนวยการกองคลัง",
                     "sub_wallets": { "office": 30000.00, "computer": 25000.00, "household": 0.00, "other": 21500.00 },
-                    "head": "นางอุไรวรรณ เครือฟู", 
                     "staff": [
-                        {"name": "นางอุไรวรรณ เครือฟู", "role": "ผู้อำนวยการกองคลัง", "pin": "2222", "is_admin": true},
-                        {"name": "นางสมพร ศรีวิทะ", "role": "หัวหน้ากลุ่มพัสดุและทรัพย์สิน", "pin": "1111", "is_admin": true},
-                        {"name": "น.ส.เครือวัลย์ กิ่งสวัสดิ์", "role": "เจ้าพนักงานพัสดุ", "pin": "1234", "is_admin": true}
+                        {"name": "นางอุไรวรรณ เครือฟู", "role": "ผู้อำนวยการกองคลัง", "pin": "2222", "is_admin": true, "task": "ผู้อำนวยการกองคลังและหัวหน้าเจ้าหน้าที่พัสดุ"},
+                        {"name": "นางสมพร ศรีวิทะ", "role": "หัวหน้ากลุ่มพัสดุและทรัพย์สิน / นักวิชาการพัสดุ", "pin": "1111", "is_admin": true, "task": "เร่งรัดตรวจรับพัสดุโครงการต่างๆ ตาม พ.ร.บ. จัดซื้อจัดจ้าง"},
+                        {"name": "น.ส.เครือวัลย์ กิ่งสวัสดิ์", "role": "เจ้าพนักงานพัสดุ", "pin": "1234", "is_admin": true, "task": "ร่วมเร่งรัดตรวจรับพัสดุและตรวจสอบเอกสารพัสดุกลาง"},
+                        {"name": "น.ส.นุศรา ปัญญาเหล็ก", "role": "นักวิชาการการเงินและบัญชี", "pin": "1234", "task": "สรุปรายงานสถานะทางการเงิน รายรับ-รายจ่าย และระบบ e-LAAS"},
+                        {"name": "นายบุญฤทธิ์ ไชยยา", "role": "นักวิชาการจัดเก็บรายได้", "pin": "1234", "task": "วางแผนและสรุปยอดคงเหลือค้างชำระภาษีประจำปี 2569"},
+                        {"name": "น.ส.สุทธิพร คำกิโล", "role": "ผู้ช่วย จพง.จัดเก็บรายได้", "pin": "1234", "task": "ติดตามการจัดเก็บภาษีที่ดินและสิ่งปลูกสร้างและภาษีป้าย"},
+                        {"name": "นายสุชาติ อินยะ", "role": "ผู้ช่วยเจ้าพนักงานธุรการ", "pin": "1234", "task": "สนับสนุนงานบันทึกข้อมูลและเดินหนังสือธุรการกองคลัง"},
+                        {"name": "นายฤทธิ์เกียรติ ปัญญาเหล็ก", "role": "จ้างเหมา", "pin": "1234", "task": "สนับสนุนภารกิจทั่วไปกองคลัง"},
+                        {"name": "น.ส.พรรณกาญจน์ ลุนแก้ว", "role": "คนงานทั่วไป", "pin": "1234", "task": "สนับสนุนงานรักษาความสะอาดและพัสดุ"},
+                        {"name": "น.ส.ศิริภรณ์ บาลเปียง", "role": "ผู้ช่วยเจ้าหน้าที่จัดเก็บรายได้", "pin": "1234", "task": "ช่วยจัดเก็บรายได้และภาษี"},
+                        {"name": "น.ส.ปุณฑริกา บุญมาใหม่", "role": "ผู้ช่วยเจ้าหน้าที่จัดเก็บรายได้", "pin": "1234", "task": "ช่วยจัดเก็บรายได้ประจำกองคลัง"},
+                        {"name": "นายส่งเสริม ฝั้นเฟือนหา", "role": "ผู้ช่วยเจ้าหน้าที่จัดเก็บรายได้", "pin": "1234", "task": "ช่วยงานจัดเก็บรายได้ อบต."}
                     ],
                     "materials": [
                         { "item_id": "BL-OFF-14", "item_name": "คลิปหนีบดำ เบอร์ 109", "price_unit_coin": 22.00, "stock_remaining": 30, "image_url": "products/neeb109.jpg", "type": "office" },
@@ -666,11 +699,17 @@
                         { "item_id": "BL-OFF-24", "item_name": "ปากกาเขียนครุภัณฑ์ EK-440 สีดำ", "price_unit_coin": 62.00, "stock_remaining": 10, "image_url": "products/PaintMarker.jpg", "type": "office" }
                     ]
                 },
-                "กองช่าง": { 
+                "กองช่าง": {
+                    "supervisor": "นายมิ่งภพ ศรีชะบา",
+                    "supervisor_role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นายพันธ์ศักดิ์ กิ่งสวัสดิ์",
+                    "head_role": "นายช่างโยธาอาวุโส",
                     "sub_wallets": { "office": 10000.00, "computer": 15000.00, "household": 0.00, "other": 157500.00 },
-                    "head": "นายพันธ์ศักดิ์ กิ่งสวัสดิ์", 
                     "staff": [
-                        {"name": "นายภิรุณ ภักดี", "role": "นายช่างโยธาอาวุโส", "pin": "1234"}
+                        {"name": "นายพันธ์ศักดิ์ กิ่งสวัสดิ์", "role": "นายช่างโยธาอาวุโส", "pin": "1234", "task": "หัวหน้ากองช่างและควบคุมงานโยธา"},
+                        {"name": "นายภิรุณ ภักดี", "role": "นายช่างโยธาอาวุโส", "pin": "1234", "task": "รายงานความคืบหน้าโครงการก่อสร้าง/ซ่อมแซมถนนและขุดลอกคูระบายน้ำ"},
+                        {"name": "นายวีระวัฒน์ ไววาง", "role": "คนงาน(ผู้ช่วยช่างไฟ)", "pin": "1234", "task": "เร่งซ่อมแซมไฟฟ้าสาธารณะตามที่ประชาชนร้องเรียน"},
+                        {"name": "นางสาวอรอนงค์ ชัยโย", "role": "เจ้าหน้าที่ธุรการ", "pin": "1234", "task": "รวบรวมข้อมูลโครงการ เอกสารตรวจรับงานจ้าง"}
                     ],
                     "materials": [
                         { "item_id": "BL-CH-01", "item_name": "ไม้บรรทัดเหล็ก 12 นิ้ว", "price_unit_coin": 35.00, "stock_remaining": 20, "image_url": "products/iron_scale.jpg", "type": "office" },
@@ -685,28 +724,24 @@
                         { "item_id": "BL-CH-10", "item_name": "ที่ถอนลวดเหล็ก Eagle", "price_unit_coin": 45.00, "stock_remaining": 12, "image_url": "products/replace.jpg", "type": "office" }
                     ]
                 },
-                "กองการศึกษา": { 
-                    "sub_wallets": { "office": 15000.00, "computer": 10000.00, "household": 222220.00, "other": 11200.00 },
-                    "head": "ผู้อำนวยการกองการศึกษาฯ", 
-                    "staff": [
-                        {"name": "เจ้าหน้าที่/ครูในสังกัด", "role": "ครูประจำศูนย์พัฒนาเด็กเล็ก", "pin": "1234"}
-                    ],
-                    "materials": [
-                        { "item_id": "RK-ED-01", "item_name": "กระดาษถ่ายเอกสาร A4 80G ตรา AA", "price_unit_coin": 120.00, "stock_remaining": 40, "image_url": "products/paper-a4.jpg", "type": "office" },
-                        { "item_id": "RK-ED-02", "item_name": "ดินสอดำ 2B Little Tree (กล่อง)", "price_unit_coin": 45.00, "stock_remaining": 25, "image_url": "products/2b_littletree.jpg", "type": "office" },
-                        { "item_id": "RK-ED-03", "item_name": "กระดาษการ์ดขาว/ชมพู 120 แกรม", "price_unit_coin": 85.00, "stock_remaining": 15, "image_url": "products/colorcard_a4.jpg", "type": "office" },
-                        { "item_id": "RK-ED-04", "item_name": "สมุดปกน้ำเงิน (สมุดมุมน้ำเงิน)", "price_unit_coin": 48.00, "stock_remaining": 48, "image_url": "products/bluebook.jpg", "type": "office" },
-                        { "item_id": "RK-ED-05", "item_name": "แฟ้มสันกว้าง 3 นิ้ว ตราช้าง 125F", "price_unit_coin": 85.00, "stock_remaining": 50, "image_url": "products/folders.jpg", "type": "office" },
-                        { "item_id": "RK-ED-06", "item_name": "แฟ้มซองพลาสติก A4 (xfile1)", "price_unit_coin": 15.00, "stock_remaining": 60, "image_url": "products/xfile1.jpg", "type": "office" },
-                        { "item_id": "RK-ED-07", "item_name": "ELEPHANT เครื่องเจาะกระดาษ DP-900", "price_unit_coin": 450.00, "stock_remaining": 3, "image_url": "products/cuuting_gun.jpg", "type": "office" }
-                    ]
-                },
-                "กองสาธารณสุขฯ": { 
+                "กองสาธารณสุขและสิ่งแวดล้อม": {
+                    "supervisor": "นางพรพิมล คำหล้า",
+                    "supervisor_role": "รองปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นายณัฐพงษ์ คำแดง",
+                    "head_role": "รักษาราชการแทน ผอ.กองสาธารณสุขและสิ่งแวดล้อม",
                     "sub_wallets": { "office": 15000.00, "computer": 10000.00, "household": 0.00, "other": 160000.00 },
-                    "head": "นายณัฐพงษ์ คำแดง", 
                     "staff": [
-                        {"name": "นางสาวจีรัณภรณ์ กันธิยะวรัชญ์", "role": "นักวิชาการสาธารณสุขปฏิบัติการ", "pin": "1234"},
-                        {"name": "นางสาววิจิตรา กิ่งสวัสดิ์", "role": "ผู้ช่วยเจ้าพนักงานธุรการ", "pin": "1234"}
+                        {"name": "นายณัฐพงษ์ คำแดง", "role": "รักษาราชการแทน ผอ.กองสาธารณสุขและสิ่งแวดล้อม", "pin": "1234", "task": "รักษาราชการแทนผู้อำนวยการกองสาธารณสุขฯ"},
+                        {"name": "นางสาวจีรัณภรณ์ กันธิยะวรัชญ์", "role": "นักวิชาการสาธารณสุขปฏิบัติการ", "pin": "1234", "task": "ติดตามโครงการป้องกันโรคไข้เลือดออกและธนาคารขยะ"},
+                        {"name": "นางสาวหทัยรัตน์ มณีวรรณ์", "role": "เจ้าพนักงานธุรการปฏิบัติงาน", "pin": "1234", "task": "บันทึกข้อมูล รายงานสถิติด้านสาธารณสุข"},
+                        {"name": "นางสาววิจิตรา กิติตา", "role": "ผู้ช่วยเจ้าพนักงานธุรการ", "pin": "1234", "task": "สนับสนุนงานธุรการกองสาธารณสุขฯ"},
+                        {"name": "นายรชานนท์ ชัยชนะ", "role": "เจ้าหน้าที่งานสาธารณสุข", "pin": "1234", "task": "ลงพื้นที่พ่นสารเคมี แจกทรายอะเบท และจัดการขยะมูลฝอย"},
+                        {"name": "นายชูเกียรติ เพิ่มบุญมา", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "สแตนด์บายช่วยเหลือประชาชนและผู้ป่วยฉุกเฉิน 24 ชั่วโมง"},
+                        {"name": "นายภาณุพงศ์ มหาวัน", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "ปฏิบัติการฉุกเฉินการแพทย์ (EMS/FR)"},
+                        {"name": "นายธนเดช ศรีวิชัย", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "ปฏิบัติการฉุกเฉินการแพทย์ (EMS/FR)"},
+                        {"name": "นายปรีชา บุญมา", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "ปฏิบัติการฉุกเฉินการแพทย์ (EMS/FR)"},
+                        {"name": "นางสาวจตุพร เชียงชีระ", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "ปฏิบัติการฉุกเฉินการแพทย์ (EMS/FR)"},
+                        {"name": "นายนิรันดร แก้วกาบคำ", "role": "เจ้าหน้าที่กู้ชีพกู้ภัย(FR)", "pin": "1234", "task": "ปฏิบัติการฉุกเฉินการแพทย์ (EMS/FR)"}
                     ],
                     "materials": [
                         { "item_id": "CK-PH-01", "item_name": "หมึกพิมพ์แท้ Canon GI-71 BK/C/M/Y", "price_unit_coin": 490.00, "stock_remaining": 12, "image_url": "products/inkGI-71.jpg", "type": "computer" },
@@ -718,11 +753,17 @@
                         { "item_id": "CK-PH-07", "item_name": "ตลับหมึกเลเซอร์ Brother TN-2480", "price_unit_coin": 2900.00, "stock_remaining": 4, "image_url": "products/tn2480.jpg", "type": "computer" }
                     ]
                 },
-                "กองสวัสดิการสังคม": { 
+                "กองสวัสดิการสังคม": {
+                    "supervisor": "นางพรพิมล คำหล้า",
+                    "supervisor_role": "รองปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นายณัฐพงษ์ คำแดง",
+                    "head_role": "ผู้อำนวยการกองสวัสดิการสังคม",
                     "sub_wallets": { "office": 10000.00, "computer": 10000.00, "household": 0.00, "other": 26500.00 },
-                    "head": "นายณัฐพงษ์ คำแดง", 
                     "staff": [
-                        {"name": "นายภูมิภัทร ชัยยะเลิศ", "role": "นักพัฒนาชุมชนปฏิบัติการ", "pin": "1234"}
+                        {"name": "นายณัฐพงษ์ คำแดง", "role": "ผู้อำนวยการกองสวัสดิการสังคม", "pin": "1234", "task": "ผู้อำนวยการกองสวัสดิการสังคม"},
+                        {"name": "นายภูมิภัทร ชัยยะเลิศ", "role": "นักพัฒนาชุมชนปฏิบัติการ", "pin": "1234", "task": "ตรวจสอบระบบและรายงานยอดการจ่ายเงินเบี้ยยังชีพกลุ่มเปราะบาง"},
+                        {"name": "นางสาวปทิตตา แสดสวนสี", "role": "เจ้าพนักงานพัฒนาชุมชนชำนาญงาน", "pin": "1234", "task": "รวบรวมข้อมูลยอดรายงานสถิติประชากรและเบี้ยยังชีพ"},
+                        {"name": "นางสาววรรณภา กันทะ", "role": "ผู้ช่วยเจ้าพนักงานธุรการ", "pin": "1234", "task": "สนับสนุนงานจัดทำบัญชีรายชื่อผู้รับเบี้ยยังชีพ"}
                     ],
                     "materials": [
                         { "item_id": "CK-SW-01", "item_name": "Toner Original BROTHER TN-267 สีดำ", "price_unit_coin": 3000.00, "stock_remaining": 4, "image_url": "products/tn267.jpg", "type": "computer" },
@@ -738,6 +779,19 @@
                         { "item_id": "RK-SW-11", "item_name": "ถ่านอัลคาไลน์ Panasonic AAA (แพ็ค)", "price_unit_coin": 123.00, "stock_remaining": 24, "image_url": "products/aaa2.jpg", "type": "other" },
                         { "item_id": "RK-SW-12", "item_name": "ชุดแท่นชาร์จพร้อมถ่าน eneloop AA", "price_unit_coin": 345.00, "stock_remaining": 5, "image_url": "products/battcarger_AAA_1.2V.jpg", "type": "other" },
                         { "item_id": "RK-SW-13", "item_name": "ปลั๊กไฟพ่วง 5 สวิตช์ 5 ช่อง (5 เมตร)", "price_unit_coin": 449.00, "stock_remaining": 8, "image_url": "products/p555.jpg", "type": "other" }
+                    ]
+                },
+                "หน่วยตรวจสอบภายใน": {
+                    "supervisor": "นายมิ่งภพ ศรีชะบา",
+                    "supervisor_role": "ปลัดองค์การบริหารส่วนตำบลข่วงเปา",
+                    "head": "นางกรนิภา ปัญญาเหล็ก",
+                    "head_role": "นักวิชาการตรวจสอบภายในปฏิบัติการ",
+                    "sub_wallets": { "office": 10000.00, "computer": 5000.00, "household": 0.00, "other": 10000.00 },
+                    "staff": [
+                        {"name": "นางกรนิภา ปัญญาเหล็ก", "role": "นักวิชาการตรวจสอบภายในปฏิบัติการ", "pin": "1234", "is_admin": true, "task": "ตรวจสอบภายในและควบคุมการเงินบัญชีและพัสดุ"}
+                    ],
+                    "materials": [
+                        { "item_id": "BL-AUD-01", "item_name": "กระดาษถ่ายเอกสาร A4 80G", "price_unit_coin": 120.00, "stock_remaining": 15, "image_url": "products/paper-a4.jpg", "type": "office" }
                     ]
                 }
             }
@@ -805,7 +859,7 @@
                 document.getElementById('login-cover-page').classList.add('hidden');
                 
                 const adminBtn = document.getElementById('btn-admin-store-trigger');
-                if (currentUser.is_admin) adminBtn.classList.remove('hidden');
+                if (currentUser.is_admin || currentDivName === "กองคลัง") adminBtn.classList.remove('hidden');
                 else adminBtn.classList.add('hidden');
 
                 document.getElementById('active-user-name').innerText = `${currentUser.name} (${currentDivName})`;
