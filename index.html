@@ -847,6 +847,7 @@
         let uploadedProductImageBase64 = "";
 
         let sharedActiveRequisition = JSON.parse(localStorage.getItem('kmart_active_req') || 'null');
+        let lastCheckedReqTimestamp = 0;
 
         function initCoverLogin() {
             const select = document.getElementById('login-user-select'); select.innerHTML = '';
@@ -910,15 +911,12 @@
 
                 document.getElementById('active-user-name').innerText = `${currentUser.name} (${currentDivName})`;
                 
-                // 🛑 บังคับเคลียร์ความจำเก่าและเซ็ตชื่อผู้ขอเบิกให้ตรงกับผู้ Login ปัจจุบันทันทีแบบสดๆ
-                localStorage.removeItem('kmart_active_req');
-                sharedActiveRequisition = null;
-                approvalStatus = { 1: false, 2: false, 3: false };
-                document.getElementById('flow-requester').innerText = currentUser.name;
-                
                 loadSharedRequisitionState();
                 updateBudgetDisplay(); updateCartUI(); renderProducts();
-                checkAndShowPopupAlerts();
+                
+                // เริ่มต้นเปิดระบบเช็คสถานะ Real-time อัตโนมัติทุกๆ 2 วินาที
+                setInterval(pollSharedState, 2000);
+
             } else {
                 document.getElementById('login-error-msg').classList.remove('hidden');
                 clearPin();
@@ -1261,10 +1259,10 @@
             closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
 
-        // --- ระบบซิงค์ข้อมูลคำขอระหว่างอุปกรณ์ผ่าน LocalStorage ---
+        // --- ระบบซิงค์ข้อมูลคำขอระหว่างอุปกรณ์ผ่าน LocalStorage และ Poll อัตโนมัติ ---
         function saveSharedRequisitionState() {
             sharedActiveRequisition = {
-                requester: currentUser.name, // ใช้ชื่อผู้ใช้งานปัจจุบันเป็นผู้ขอเบิกเสมอ
+                requester: currentUser.name, 
                 division: currentDivName,
                 cart: cart,
                 purpose: document.getElementById('project-purpose').value,
@@ -1272,6 +1270,7 @@
                 timestamp: new Date().getTime()
             };
             localStorage.setItem('kmart_active_req', JSON.stringify(sharedActiveRequisition));
+            lastCheckedReqTimestamp = sharedActiveRequisition.timestamp;
         }
 
         function loadSharedRequisitionState() {
@@ -1279,8 +1278,8 @@
             if (saved) {
                 sharedActiveRequisition = JSON.parse(saved);
                 approvalStatus = sharedActiveRequisition.approvalStatus || { 1: false, 2: false, 3: false };
+                lastCheckedReqTimestamp = sharedActiveRequisition.timestamp || 0;
                 
-                // บังคับแสดงชื่อผู้ขอเบิกตาม currentUser ปัจจุบันเสมอ ป้องกันชื่อเก่าหลุดมา
                 if (currentUser && currentUser.name) {
                     document.getElementById('flow-requester').innerText = currentUser.name;
                 } else if (sharedActiveRequisition.requester) {
@@ -1297,6 +1296,36 @@
                 }
             }
             updateApprovalButtonsUI();
+        }
+
+        // ฟังก์ชันดึงตรวจเช็คข้อมูลอัตโนมัติทุกๆ 2 วินาที (เพื่อให้หน้าจอ จนท.พัสดุเด้งเตือนทันที)
+        function pollSharedState() {
+            const saved = localStorage.getItem('kmart_active_req');
+            if (!saved) return;
+            const req = JSON.parse(saved);
+
+            if (req.timestamp && req.timestamp !== lastCheckedReqTimestamp) {
+                lastCheckedReqTimestamp = req.timestamp;
+                sharedActiveRequisition = req;
+                approvalStatus = req.approvalStatus || approvalStatus;
+                updateApprovalButtonsUI();
+
+                // เช็คเงื่อนไขเด้ง Popup เตือนตามสิทธิ์ผู้ใช้งานปัจจุบัน
+                if (currentUser.name === "นางสมพร ศรีวิทะ" && req.approvalStatus[1] && !req.approvalStatus[2]) {
+                    showPopupModal(
+                        "🚨 แจ้งเตือนคำขอเบิกพัสดุใหม่",
+                        `<strong>${req.requester}</strong> (${req.division}) ได้กดเสนอขอเบิกพัสดุเข้ามาแล้ว กรุณาตรวจสอบและกดอนุมัติ`,
+                        req.cart
+                    );
+                }
+                else if (currentUser.name === "นางอุไรวรรณ เครือฟู" && req.approvalStatus[2] && !req.approvalStatus[3]) {
+                    showPopupModal(
+                        "🚨 แจ้งเตือนคำขอรออนุมัติขั้นสุดท้าย",
+                        `<strong>นางสมพร ศรีวิทะ</strong> ได้ตรวจสอบและอนุมัติคำขอของ <strong>${req.requester}</strong> แล้ว กรุณาตรวจสอบและกดอนุมัติขั้นสุดท้าย`,
+                        req.cart
+                    );
+                }
+            }
         }
 
         function updateApprovalButtonsUI() {
@@ -1324,27 +1353,6 @@
                         stampBox.className = "text-[9px] bg-slate-100 text-slate-400 border border-slate-300 rounded-lg px-3 py-1 font-bold uppercase mb-0.5";
                     }
                 }
-            }
-        }
-
-        function checkAndShowPopupAlerts() {
-            const saved = localStorage.getItem('kmart_active_req');
-            if (!saved) return;
-            const req = JSON.parse(saved);
-            
-            if (currentUser.name === "นางสมพร ศรีวิทะ" && req.approvalStatus[1] && !req.approvalStatus[2]) {
-                showPopupModal(
-                    "แจ้งเตือนคำขอเบิกพัสดุใหม่",
-                    `<strong>${req.requester}</strong> (${req.division}) ได้กดเสนอขอเบิกพัสดุเข้ามาแล้ว กรุณาตรวจสอบและกดอนุมัติ`,
-                    req.cart
-                );
-            }
-            else if (currentUser.name === "นางอุไรวรรณ เครือฟู" && req.approvalStatus[2] && !req.approvalStatus[3]) {
-                showPopupModal(
-                    "แจ้งเตือนคำขอรออนุมัติขั้นสุดท้าย",
-                    `<strong>นางสมพร ศรีวิทะ</strong> ได้ตรวจสอบและอนุมัติคำขอของ <strong>${req.requester}</strong> แล้ว กรุณาตรวจสอบและกดอนุมัติขั้นสุดท้าย`,
-                    req.cart
-                );
             }
         }
 
