@@ -334,7 +334,7 @@
         <div class="max-w-3xl w-full bg-[#07241C] border-2 border-[#10B981]/50 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-gradient-to-r from-[#031711] to-[#0A382C] p-4 text-white flex justify-between items-center border-b border-[#10B981]/30">
                 <h3 class="font-bold text-sm text-[#A7F3D0] flex items-center gap-2">
-                    <i class="fa-solid fa-boxes-packing text-[#10B981]"></i> ระบบจัดการคลังพัสดุ & บันทึกจัดซื้อจริง (Admin Store Cloud)
+                    <i class="fa-solid fa-boxes-packing text-[#10B981]"></i> ระบบจัดการคลังพัสดุ & แก้ไข/ลบสินค้า (Admin Store Cloud)
                 </h3>
                 <button onclick="closeAdminStoreModal()" class="text-emerald-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -359,16 +359,17 @@
                     </div>
                 </div>
 
+                <!-- ส่วนที่ 1: เพิ่ม/อัปเดต/แก้ไขรูปภาพพัสดุ -->
                 <div class="bg-[#031711] p-4 rounded-2xl border border-emerald-500/30 space-y-3">
                     <h4 class="font-bold text-[#34D399] flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-file-invoice-dollar text-base text-[#10B981]"></i> 1. เพิ่ม/จัดซื้อแบบเป็นทางการ (มีใบส่งของ/บิลอ้างอิงราคาจริง)
+                        <i class="fa-solid fa-file-invoice-dollar text-base text-[#10B981]"></i> 1. เพิ่ม หรือ แก้ไขข้อมูล/รูปภาพพัสดุที่มีอยู่แล้ว
                     </h4>
-                    <p class="text-[10px] text-slate-400">เลือกรายการพัสดุใน List หรือพิมพ์ชื่อพัสดุใหม่หากไม่อยู่ใน List เพื่อเพิ่มเข้าคลังอย่างเป็นทางการ</p>
+                    <p class="text-[10px] text-slate-400">เลือกรายการพัสดุเพื่อแก้ไขราคา ชื่อ หรือเปลี่ยนรูปภาพให้ถูกต้อง (หรือเลือก [เพิ่มรายการใหม่])</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="sm:col-span-2">
-                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">เลือกรายการที่มีใน List หรือเลือก [รายการใหม่ไม่อยู่ใน List]:</label>
-                            <select id="admin-select-material" onchange="toggleFormalNewInput()" class="w-full bg-[#07241C] text-white border border-emerald-500/40 rounded-xl p-2 font-medium"></select>
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">เลือกรายการพัสดุ:</label>
+                            <select id="admin-select-material" onchange="onAdminMaterialSelectChange()" class="w-full bg-[#07241C] text-white border border-emerald-500/40 rounded-xl p-2 font-medium"></select>
                         </div>
 
                         <div id="formal-new-item-box" class="sm:col-span-2 hidden bg-[#07241C] p-2.5 rounded-xl border border-amber-500/40 space-y-2">
@@ -389,37 +390,46 @@
                                         <option value="other">📦 วัสดุอื่นๆ</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="block text-[9px] text-slate-300">รูปภาพพัสดุใหม่ (ซิงค์ขึ้น Cloud):</label>
-                                    <input type="file" accept="image/*" id="admin-formal-img-file" onchange="previewProductImg(event, 'formal-img-preview')" class="text-[10px] text-slate-300">
-                                </div>
                             </div>
-                            <img id="formal-img-preview" src="" class="w-16 h-16 object-cover rounded-lg border border-amber-400 hidden mt-1">
+                        </div>
+
+                        <!-- ส่วนอัปโหลดรูปภาพใหม่เพื่อแก้ภาพไม่ตรง -->
+                        <div class="sm:col-span-2 bg-[#07241C] p-3 rounded-xl border border-emerald-600/40 space-y-2">
+                            <label class="block text-[10px] font-bold text-emerald-300 flex items-center gap-1">
+                                <i class="fa-solid fa-image"></i> 🖼️ เปลี่ยนหรืออัปโหลดรูปภาพสินค้าใหม่ (แก้ภาพไม่ตรง):
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <input type="file" accept="image/*" id="admin-product-img-file" onchange="previewProductImg(event, 'store-img-preview')" class="text-xs text-slate-300">
+                                <img id="store-img-preview" src="" class="w-14 h-14 object-cover rounded-xl border border-emerald-400 hidden">
+                            </div>
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">ราคาจัดซื้อจริงต่อหน่วย (บาท THB):</label>
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">ราคาต่อหน่วย (บาท THB):</label>
                             <input type="number" id="admin-input-price" step="0.01" placeholder="เช่น 125.00" class="w-full bg-[#07241C] text-emerald-300 border border-emerald-500/40 rounded-xl p-2 font-bold">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">จำนวนที่รับเข้าคลังเพิ่ม (หน่วย):</label>
+                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">จำนวนสต็อกที่เพิ่ม / มีอยู่:</label>
                             <input type="number" id="admin-input-add-qty" placeholder="เช่น 20" class="w-full bg-[#07241C] text-emerald-300 border border-emerald-500/40 rounded-xl p-2 font-bold">
                         </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-[10px] font-bold text-emerald-200/70 mb-1">เลขที่ใบส่งของ / บิลจัดซื้อ (Lot ID อ้างอิง):</label>
-                            <input type="text" id="admin-input-lot-id" placeholder="เช่น INV-2569-0099" class="w-full bg-[#07241C] text-white border border-emerald-500/40 rounded-xl p-2 font-medium">
-                        </div>
                     </div>
-                    <button onclick="saveStoreItemUpdate()" class="w-full neon-glow-btn text-white font-bold py-2.5 rounded-xl transition">
-                        💾 บันทึกรับเข้าคลังแบบเป็นทางการ (ซิงค์ข้ามเครื่อง)
-                    </button>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="saveStoreItemUpdate()" class="flex-1 neon-glow-btn text-white font-bold py-2.5 rounded-xl transition text-xs">
+                            💾 บันทึกข้อมูล / อัปเดตรูปภาพ (ซิงค์ Cloud)
+                        </button>
+                        <button onclick="deleteCurrentAdminItem()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl transition text-xs flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> ลบสินค้านี้
+                        </button>
+                    </div>
                 </div>
 
+                <!-- ส่วนที่ 2: เพิ่มสินค้าแบบอิสระ -->
                 <div class="bg-[#031711] p-4 rounded-2xl border border-blue-500/30 space-y-3">
                     <h4 class="font-bold text-blue-300 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-utensils text-blue-400"></i> 2. เพิ่มสินค้าแบบอิสระ / พัสดุเลี้ยงรับรอง & งานเฉพาะกิจ (พร้อมถ่ายภาพ)
+                        <i class="fa-solid fa-utensils text-blue-400"></i> 2. เพิ่มสินค้าแบบอิสระ / พัสดุเลี้ยงรับรอง & งานเฉพาะกิจ
                     </h4>
-                    <p class="text-[10px] text-slate-400">สำหรับสินค้าประเภทอาหารเลี้ยงรับรองประชุม, วัสดุเฉพาะกิจ หรือรายการอิสระที่ไม่บังคับมีบิลอ้างอิง</p>
+                    <p class="text-[10px] text-slate-400">สำหรับสินค้าประเภทอาหารเลี้ยงรับรองประชุม หรือรายการอิสระทั่วไป</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="sm:col-span-2">
@@ -450,7 +460,7 @@
 
                         <div class="sm:col-span-2 bg-[#07241C] p-3 rounded-xl border border-slate-700 space-y-2">
                             <label class="block text-[10px] font-bold text-blue-200 flex items-center gap-1">
-                                <i class="fa-solid fa-camera text-blue-400"></i> 📸 ถ่ายภาพ หรือเลือกรูปภาพสินค้าอิสระ (แสดงผลมือถือ 100%):
+                                <i class="fa-solid fa-camera text-blue-400"></i> 📸 ถ่ายภาพ หรือเลือกรูปภาพสินค้าอิสระ:
                             </label>
                             <div class="flex items-center gap-3">
                                 <input type="file" id="free-product-img-file" accept="image/*" onchange="previewProductImg(event, 'free-img-preview')" class="text-xs text-slate-300">
@@ -658,7 +668,6 @@
 
         const BACKEND_PROXY_URL = "https://kmart-proxy-api.rook1000000008.workers.dev";
 
-        // รายชื่อบุคลากรและเจ้าหน้าที่อัปเดตตามไฟล์ทางการ อบต.ข่วงเปา
         let personnelData = {
             "organization": "องค์การบริหารส่วนตำบลข่วงเปา",
             "command_period": "ประจำเดือนกรกฎาคม 2569",
@@ -692,9 +701,9 @@
                         { "item_id": "BL-OFF-09", "item_name": "เทปใส แกนใหญ่ 3/4 นิ้ว", "price_unit_coin": 18.00, "stock_remaining": 50, "image_url": "products/tape.jpg", "type": "office" },
                         { "item_id": "BL-OFF-11", "item_name": "ซองขาว ครุฑ (50 ซอง/มัด)", "price_unit_coin": 30.00, "stock_remaining": 30, "image_url": "products/mails.jpg", "type": "office" },
                         { "item_id": "BL-OFF-13", "item_name": "เครื่องคิดเลข Canon TX-121OHI III", "price_unit_coin": 390.00, "stock_remaining": 10, "image_url": "products/cal.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-15", "item_name": "หลอดไฟ LED T8 18W", "price_unit_coin": 150.00, "stock_remaining": 30, "image_url": "products/cal.jpg", "type": "electrical" },
-                        { "item_id": "BL-CH-03", "item_name": "ท่อ PVC 4 นิ้ว ชั้น 8.5", "price_unit_coin": 220.00, "stock_remaining": 40, "image_url": "products/paper-a4.jpg", "type": "construction" },
-                        { "item_id": "CK-PH-01", "item_name": "หน้ากากอนามัยทางการแพทย์ (กล่อง 50 ชิ้น)", "price_unit_coin": 65.00, "stock_remaining": 50, "image_url": "products/cal.jpg", "type": "medical" }
+                        { "item_id": "BL-OFF-15", "item_name": "หลอดไฟ LED T8 18W", "price_unit_coin": 150.00, "stock_remaining": 30, "image_url": "https://placehold.co/150?text=LED+Bulb", "type": "electrical" },
+                        { "item_id": "BL-CH-03", "item_name": "ท่อ PVC 4 นิ้ว ชั้น 8.5", "price_unit_coin": 220.00, "stock_remaining": 40, "image_url": "https://placehold.co/150?text=PVC+Pipe", "type": "construction" },
+                        { "item_id": "CK-PH-01", "item_name": "หน้ากากอนามัยทางการแพทย์ (กล่อง 50 ชิ้น)", "price_unit_coin": 65.00, "stock_remaining": 50, "image_url": "https://placehold.co/150?text=Medical+Mask", "type": "medical" }
                     ]
                 }
             }
@@ -715,14 +724,13 @@
         let enteredPin = ""; let activeCategory = "all";
         let uploadedProductImageBase64 = "";
 
-        // โหลดข้อมูลจาก Firebase Realtime Database ทันทีเมื่อเปิดเว็บแบบเรียลไทม์
         function syncDataFromFirebase() {
             db.ref('kmart_data').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
                     personnelData = cloudData;
                 } else {
-                    db.ref('kmart_data').set(personnelData); // บันทึกค่าเริ่มต้นขึ้นคลาวด์ครั้งแรก
+                    db.ref('kmart_data').set(personnelData);
                 }
                 if (currentDivName) {
                     updateBudgetDisplay();
@@ -1035,26 +1043,54 @@
         function openAdminStoreModal() {
             const modal = document.getElementById('admin-store-modal');
             const select = document.getElementById('admin-select-material');
-            select.innerHTML = '<option value="NEW_ITEM">✨ + [เพิ่มรายการใหม่ไม่อยู่ใน List]</option>';
+            select.innerHTML = '<option value="NEW_ITEM">✨ + [เพิ่มรายการพัสดุใหม่]</option>';
             
             const currentMaterials = getCurrentDivMaterials();
             currentMaterials.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.item_id;
-                opt.innerText = `[${p.item_id}] ${p.item_name} (ปัจจุบัน: ${p.price_unit_coin} ฿ | สต็อก: ${p.stock_remaining})`;
+                opt.innerText = `[${p.item_id}] ${p.item_name} (ราคา: ${p.price_unit_coin} ฿ | สต็อก: ${p.stock_remaining})`;
                 select.appendChild(opt);
             });
 
-            document.getElementById('admin-input-lot-id').value = "INV-2569-" + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('scan-status-text').innerText = "";
-            toggleFormalNewInput(); modal.classList.remove('hidden');
+            onAdminMaterialSelectChange();
+            modal.classList.remove('hidden');
         }
 
         function closeAdminStoreModal() { document.getElementById('admin-store-modal').classList.add('hidden'); }
-        function toggleFormalNewInput() {
+
+        function onAdminMaterialSelectChange() {
             const selectVal = document.getElementById('admin-select-material').value;
             const newBox = document.getElementById('formal-new-item-box');
-            if (selectVal === "NEW_ITEM") newBox.classList.remove('hidden'); else newBox.classList.add('hidden');
+            const priceInput = document.getElementById('admin-input-price');
+            const qtyInput = document.getElementById('admin-input-add-qty');
+            const previewImg = document.getElementById('store-img-preview');
+            const currentMaterials = getCurrentDivMaterials();
+
+            uploadedProductImageBase64 = ""; // Reset รูปที่เลือกใหม่
+
+            if (selectVal === "NEW_ITEM") {
+                newBox.classList.remove('hidden');
+                document.getElementById('admin-formal-new-name').value = "";
+                priceInput.value = "";
+                qtyInput.value = "";
+                previewImg.src = "";
+                previewImg.classList.add('hidden');
+            } else {
+                newBox.classList.add('hidden');
+                const item = currentMaterials.find(p => p.item_id === selectVal);
+                if (item) {
+                    priceInput.value = item.price_unit_coin;
+                    qtyInput.value = item.stock_remaining;
+                    if (item.image_url) {
+                        previewImg.src = item.image_url;
+                        previewImg.classList.remove('hidden');
+                    } else {
+                        previewImg.src = "";
+                        previewImg.classList.add('hidden');
+                    }
+                }
+            }
         }
 
         function previewProductImg(event, previewId) {
@@ -1065,47 +1101,77 @@
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
                     previewImg.classList.remove('hidden');
-                    uploadedProductImageBase64 = e.target.result; // แปลงภาพเป็น Base64
+                    uploadedProductImageBase64 = e.target.result; // บันทึก Base64 ของภาพใหม่
                 };
                 reader.readAsDataURL(file);
             }
         }
 
+        // บันทึกแก้ไขข้อมูล หรือเพิ่มสินค้าใหม่ พร้อมอัปเดตรูปภาพ
         function saveStoreItemUpdate() {
             const selectVal = document.getElementById('admin-select-material').value;
             const newPrice = parseFloat(document.getElementById('admin-input-price').value);
             const addQty = parseInt(document.getElementById('admin-input-add-qty').value);
-            const lotId = document.getElementById('admin-input-lot-id').value;
             const currentMaterials = getCurrentDivMaterials();
 
-            if (isNaN(newPrice) || newPrice <= 0 || isNaN(addQty) || addQty <= 0) {
-                alert("❌ กรุณาระบุราคาจัดซื้อและจำนวนสินค้าที่เพิ่มเข้าคลังให้ถูกต้อง"); return;
+            if (isNaN(newPrice) || newPrice < 0 || isNaN(addQty) || addQty < 0) {
+                alert("❌ กรุณาระบุราคาและจำนวนให้ถูกต้องครับ"); return;
             }
 
             if (selectVal === "NEW_ITEM") {
                 const newName = document.getElementById('admin-formal-new-name').value;
                 const newType = document.getElementById('admin-formal-new-type').value;
-                if (!newName.trim()) { alert("❌ กรุณาพิมพ์ชื่อพัสดุรายการใหม่ด้วยครับ"); return; }
+                if (!newName.trim()) { alert("❌ กรุณาพิมพ์ชื่อพัสดุใหม่ด้วยครับ"); return; }
 
-                const newItemId = "FORMAL-" + Date.now();
-                const imgUrl = uploadedProductImageBase64 || "products/paper-a4.jpg";
+                const newItemId = "ITEM-" + Date.now();
+                const imgUrl = uploadedProductImageBase64 || "https://placehold.co/150?text=📦";
 
                 currentMaterials.push({
-                    item_id: newItemId, item_name: `${newName} (บิล: ${lotId})`, price_unit_coin: newPrice,
+                    item_id: newItemId, item_name: newName, price_unit_coin: newPrice,
                     stock_remaining: addQty, image_url: imgUrl, type: newType
                 });
-                alert(`✅ บันทึกพัสดุใหม่ [${newName}] ลงคลาวด์สำเร็จ!`);
+                alert(`✅ เพิ่มพัสดุใหม่ [${newName}] สำเร็จ!`);
             } else {
                 const item = currentMaterials.find(p => p.item_id === selectVal);
                 if (item) {
                     item.price_unit_coin = newPrice;
-                    item.stock_remaining += addQty;
-                    alert(`✅ อัปเดตสต็อก [${item.item_name}] บนคลาวด์สำเร็จ!`);
+                    item.stock_remaining = addQty;
+                    // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้แทนที่รูปเดิมทันที
+                    if (uploadedProductImageBase64) {
+                        item.image_url = uploadedProductImageBase64;
+                    }
+                    alert(`✅ อัปเดตข้อมูลและรูปภาพของ [${item.item_name}] สำเร็จ!`);
                 }
             }
 
-            saveCloudData(); // บันทึกข้อมูลและรูปภาพทั้งหมดขึ้น Firebase Cloud ทันที
-            closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
+            saveCloudData(); // ซิงค์ขึ้น Firebase ทันที
+            closeAdminStoreModal(); 
+            renderProducts(); 
+            uploadedProductImageBase64 = "";
+        }
+
+        // ฟังก์ชันสำหรับลบสินค้าออกจากระบบ
+        function deleteCurrentAdminItem() {
+            const selectVal = document.getElementById('admin-select-material').value;
+            if (selectVal === "NEW_ITEM") {
+                alert("⚠️ กรุณาเลือกรายการพัสดุที่ต้องการลบจากระบบครับ");
+                return;
+            }
+
+            const currentMaterials = getCurrentDivMaterials();
+            const itemIndex = currentMaterials.findIndex(p => p.item_id === selectVal);
+            
+            if (itemIndex !== -1) {
+                const itemName = currentMaterials[itemIndex].item_name;
+                if (confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบรายการพัสดุ "${itemName}" ออกจากระบบคลัง?`)) {
+                    currentMaterials.splice(itemIndex, 1);
+                    saveCloudData(); // ซิงค์ข้อมูลที่ลบแล้วขึ้น Firebase ทันที
+                    alert(`🗑️ ลบรายการพัสดุเรียบร้อยแล้ว`);
+                    closeAdminStoreModal();
+                    renderProducts();
+                    updateCartUI();
+                }
+            }
         }
 
         function addNewMaterialItem() {
@@ -1119,16 +1185,16 @@
             }
 
             const currentMaterials = getCurrentDivMaterials();
-            const newItemId = "FREE-ITEM-" + Date.now();
-            const imgUrl = uploadedProductImageBase64 || "https://placehold.co/150?text=🍱+อาหาร/พัสดุอิสระ";
+            const newItemId = "FREE-" + Date.now();
+            const imgUrl = uploadedProductImageBase64 || "https://placehold.co/150?text=🍱+อาหาร/พัสดุ";
             
             currentMaterials.push({
                 item_id: newItemId, item_name: name, price_unit_coin: price,
                 stock_remaining: stock, image_url: imgUrl, type: type
             });
 
-            saveCloudData(); // บันทึกข้อมูลและรูปภาพขึ้น Firebase Cloud ทันที
-            alert(`✅ บันทึกสินค้าอิสระ [${name}] ขึ้นคลาวด์สำเร็จ!`);
+            saveCloudData();
+            alert(`✅ บันทึกสินค้าอิสระ [${name}] ขึ้นคลังสำเร็จ!`);
             closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
 
@@ -1191,8 +1257,8 @@
                         if (parsedData.item_id) document.getElementById('admin-select-material').value = parsedData.item_id;
                         if (parsedData.price) document.getElementById('admin-input-price').value = parsedData.price;
                         if (parsedData.qty) document.getElementById('admin-input-add-qty').value = parsedData.qty;
-                        if (parsedData.lot_id) document.getElementById('admin-input-lot-id').value = parsedData.lot_id;
                         statusText.innerText = "✅ น้องกะปิแกะข้อมูลลงฟอร์มเรียบร้อย!";
+                        onAdminMaterialSelectChange();
                         alert("✨ น้องกะปิอ่านเอกสารสำเร็จ เติมข้อมูลลงฟอร์มให้อัตโนมัติแล้วครับ");
                     }
                 } catch (err) { statusText.innerText = "❌ เกิดข้อผิดพลาดในการสแกน"; }
@@ -1226,7 +1292,7 @@
                 }
             });
 
-            saveCloudData(); // บันทึกตัดสต็อกและงบประมาณขึ้น Firebase Cloud ทันที
+            saveCloudData();
 
             const walletsAfter = personnelData.divisions[currentDivName].sub_wallets;
             const recId = "KP-REC-" + new Date().getFullYear() + "/" + Math.floor(1000 + Math.random() * 9000);
@@ -1312,7 +1378,6 @@
             }, 350);
         }
 
-        // เริ่มต้นการทำงาน ดึงข้อมูลซิงค์จาก Firebase Realtime Database ทันที
         syncDataFromFirebase();
         initCoverLogin();
     </script>
