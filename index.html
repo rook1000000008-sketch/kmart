@@ -1040,8 +1040,7 @@
 
         function filterItems() { renderProducts(); }
 
-        function openAdminStoreModal() {
-            const modal = document.getElementById('admin-store-modal');
+        function refreshAdminSelectOptions(keepSelectedValue) {
             const select = document.getElementById('admin-select-material');
             select.innerHTML = '<option value="NEW_ITEM">✨ + [เพิ่มรายการพัสดุใหม่]</option>';
             
@@ -1053,6 +1052,14 @@
                 select.appendChild(opt);
             });
 
+            if (keepSelectedValue) {
+                select.value = keepSelectedValue;
+            }
+        }
+
+        function openAdminStoreModal() {
+            const modal = document.getElementById('admin-store-modal');
+            refreshAdminSelectOptions("NEW_ITEM");
             onAdminMaterialSelectChange();
             modal.classList.remove('hidden');
         }
@@ -1067,7 +1074,7 @@
             const previewImg = document.getElementById('store-img-preview');
             const currentMaterials = getCurrentDivMaterials();
 
-            uploadedProductImageBase64 = ""; // Reset รูปที่เลือกใหม่
+            uploadedProductImageBase64 = "";
 
             if (selectVal === "NEW_ITEM") {
                 newBox.classList.remove('hidden');
@@ -1101,13 +1108,13 @@
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
                     previewImg.classList.remove('hidden');
-                    uploadedProductImageBase64 = e.target.result; // บันทึก Base64 ของภาพใหม่
+                    uploadedProductImageBase64 = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // บันทึกแก้ไขข้อมูล หรือเพิ่มสินค้าใหม่ พร้อมอัปเดตรูปภาพ
+        // บันทึกแก้ไขข้อมูล หรือเพิ่มสินค้าใหม่ (ไม่ปิดหน้าต่าง เพื่อให้เพิ่มสินค้าชิ้นต่อไปได้ทันที)
         function saveStoreItemUpdate() {
             const selectVal = document.getElementById('admin-select-material').value;
             const newPrice = parseFloat(document.getElementById('admin-input-price').value);
@@ -1130,13 +1137,22 @@
                     item_id: newItemId, item_name: newName, price_unit_coin: newPrice,
                     stock_remaining: addQty, image_url: imgUrl, type: newType
                 });
-                alert(`✅ เพิ่มพัสดุใหม่ [${newName}] สำเร็จ!`);
+                alert(`✅ เพิ่มพัสดุใหม่ [${newName}] สำเร็จ!\n(สามารถเพิ่มรายการต่อไปได้ทันที)`);
+                
+                // เคลียร์ฟอร์มให้ว่างเพื่อรองรับการเพิ่มสินค้าชิ้นถัดไป
+                document.getElementById('admin-formal-new-name').value = "";
+                document.getElementById('admin-input-price').value = "";
+                document.getElementById('admin-input-add-qty').value = "";
+                document.getElementById('admin-product-img-file').value = "";
+                document.getElementById('store-img-preview').src = "";
+                document.getElementById('store-img-preview').classList.add('hidden');
+                uploadedProductImageBase64 = "";
+
             } else {
                 const item = currentMaterials.find(p => p.item_id === selectVal);
                 if (item) {
                     item.price_unit_coin = newPrice;
                     item.stock_remaining = addQty;
-                    // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้แทนที่รูปเดิมทันที
                     if (uploadedProductImageBase64) {
                         item.image_url = uploadedProductImageBase64;
                     }
@@ -1145,12 +1161,11 @@
             }
 
             saveCloudData(); // ซิงค์ขึ้น Firebase ทันที
-            closeAdminStoreModal(); 
             renderProducts(); 
-            uploadedProductImageBase64 = "";
+            refreshAdminSelectOptions(selectVal === "NEW_ITEM" ? "NEW_ITEM" : selectVal);
         }
 
-        // ฟังก์ชันสำหรับลบสินค้าออกจากระบบ
+        // ฟังก์ชันลบสินค้า
         function deleteCurrentAdminItem() {
             const selectVal = document.getElementById('admin-select-material').value;
             if (selectVal === "NEW_ITEM") {
@@ -1165,9 +1180,10 @@
                 const itemName = currentMaterials[itemIndex].item_name;
                 if (confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบรายการพัสดุ "${itemName}" ออกจากระบบคลัง?`)) {
                     currentMaterials.splice(itemIndex, 1);
-                    saveCloudData(); // ซิงค์ข้อมูลที่ลบแล้วขึ้น Firebase ทันที
+                    saveCloudData();
                     alert(`🗑️ ลบรายการพัสดุเรียบร้อยแล้ว`);
-                    closeAdminStoreModal();
+                    refreshAdminSelectOptions("NEW_ITEM");
+                    onAdminMaterialSelectChange();
                     renderProducts();
                     updateCartUI();
                 }
@@ -1194,8 +1210,18 @@
             });
 
             saveCloudData();
-            alert(`✅ บันทึกสินค้าอิสระ [${name}] ขึ้นคลังสำเร็จ!`);
-            closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
+            alert(`✅ บันทึกสินค้าอิสระ [${name}] ขึ้นคลังสำเร็จ!\n(สามารถเพิ่มรายการต่อไปได้ทันที)`);
+            
+            // เคลียร์ฟอร์มอิสระให้ว่าง
+            document.getElementById('admin-new-name').value = "";
+            document.getElementById('admin-new-price').value = "";
+            document.getElementById('admin-new-stock').value = "";
+            document.getElementById('free-product-img-file').value = "";
+            document.getElementById('free-img-preview').src = "";
+            document.getElementById('free-img-preview').classList.add('hidden');
+            uploadedProductImageBase64 = "";
+
+            renderProducts(); 
         }
 
         function toggleKapiChat() { document.getElementById("kapiChatBox").classList.toggle("hidden"); }
