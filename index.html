@@ -715,7 +715,7 @@
         let enteredPin = ""; let activeCategory = "all";
         let uploadedProductImageBase64 = "";
 
-        // โหลดข้อมูลจาก Firebase Realtime Database ทันทีเมื่อเปิดเว็บ
+        // โหลดข้อมูลจาก Firebase Realtime Database ทันทีเมื่อเปิดเว็บแบบเรียลไทม์
         function syncDataFromFirebase() {
             db.ref('kmart_data').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
@@ -1104,7 +1104,7 @@
                 }
             }
 
-            saveCloudData(); // ส่งข้อมูลทั้งหมดขึ้น Firebase Cloud ทันที
+            saveCloudData(); // บันทึกข้อมูลและรูปภาพทั้งหมดขึ้น Firebase Cloud ทันที
             closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
 
@@ -1127,7 +1127,7 @@
                 stock_remaining: stock, image_url: imgUrl, type: type
             });
 
-            saveCloudData(); // ส่งขึ้น Firebase Cloud ทันที
+            saveCloudData(); // บันทึกข้อมูลและรูปภาพขึ้น Firebase Cloud ทันที
             alert(`✅ บันทึกสินค้าอิสระ [${name}] ขึ้นคลาวด์สำเร็จ!`);
             closeAdminStoreModal(); renderProducts(); uploadedProductImageBase64 = "";
         }
@@ -1226,7 +1226,7 @@
                 }
             });
 
-            saveCloudData(); // บันทึกตัดสต็อกขึ้น Firebase Cloud ทันที
+            saveCloudData(); // บันทึกตัดสต็อกและงบประมาณขึ้น Firebase Cloud ทันที
 
             const walletsAfter = personnelData.divisions[currentDivName].sub_wallets;
             const recId = "KP-REC-" + new Date().getFullYear() + "/" + Math.floor(1000 + Math.random() * 9000);
@@ -1312,7 +1312,7 @@
             }, 350);
         }
 
-        // เริ่มต้นการทำงาน ดึงข้อมูลซิงค์จาก Firebase ทันที
+        // เริ่มต้นการทำงาน ดึงข้อมูลซิงค์จาก Firebase Realtime Database ทันที
         syncDataFromFirebase();
         initCoverLogin();
     </script>
