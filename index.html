@@ -1227,10 +1227,11 @@
         }
 
         // เริ่มการทำงานระบบ
-    document.addEventListener('DOMContentLoaded', () => {
-    syncDataFromFirebase();
-    initCoverLogin();
-    });
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductsFromGithubJSON();
+            syncDataFromFirebase();
+            initCoverLogin();
+        });
     </script>
 </body>
 </html>
