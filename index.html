@@ -692,22 +692,24 @@
                         {"name": "นางสาวนิลวรรณ ต๊ะอ๊อด", "role": "เจ้าพนักงานธุรการปฏิบัติงาน", "pin": "1234", "task": "ผู้เบิกพัสดุ"},
                         {"name": "นางสาวชฎาพร นันตาบุญ", "role": "ผู้ช่วยผู้ดูแลเด็ก", "pin": "1234", "task": "ผู้เบิกพัสดุ"}
                     ],
-                    "materials": [
-                        { "item_id": "BL-OFF-01", "item_name": "กระดาษถ่ายเอกสาร AA 80G A4 (500 แผ่น)", "price_unit_coin": 120.00, "stock_remaining": 50, "image_url": "products/paper-a4.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-02", "item_name": "ปากกาลูกลื่น ควอนดั้ม 0.5 M5 Pearl", "price_unit_coin": 10.00, "stock_remaining": 100, "image_url": "products/pen.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-03", "item_name": "ปากกาหมึกเจล Pentel 0.5", "price_unit_coin": 35.00, "stock_remaining": 40, "image_url": "products/jelpen0.5.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-04", "item_name": "กระดาษสติ๊กเกอร์ขาวด้าน A4", "price_unit_coin": 85.00, "stock_remaining": 30, "image_url": "products/sticker_a4.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-05", "item_name": "เทปลบคำผิด สเต็ดเลอร์ 5มม. x 6ม.", "price_unit_coin": 35.00, "stock_remaining": 40, "image_url": "products/StaedtlerEraser.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-09", "item_name": "เทปใส แกนใหญ่ 3/4 นิ้ว", "price_unit_coin": 18.00, "stock_remaining": 50, "image_url": "products/tape.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-11", "item_name": "ซองขาว ครุฑ (50 ซอง/มัด)", "price_unit_coin": 30.00, "stock_remaining": 30, "image_url": "products/mails.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-13", "item_name": "เครื่องคิดเลข Canon TX-121OHI III", "price_unit_coin": 390.00, "stock_remaining": 10, "image_url": "products/cal.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-15", "item_name": "หลอดไฟ LED T8 18W", "price_unit_coin": 150.00, "stock_remaining": 30, "image_url": "https://placehold.co/150?text=LED+Bulb", "type": "electrical" },
-                        { "item_id": "BL-CH-03", "item_name": "ท่อ PVC 4 นิ้ว ชั้น 8.5", "price_unit_coin": 220.00, "stock_remaining": 40, "image_url": "https://placehold.co/150?text=PVC+Pipe", "type": "construction" },
-                        { "item_id": "CK-PH-01", "item_name": "หน้ากากอนามัยทางการแพทย์ (กล่อง 50 ชิ้น)", "price_unit_coin": 65.00, "stock_remaining": 50, "image_url": "https://placehold.co/150?text=Medical+Mask", "type": "medical" }
-                    ]
+                    "materials": []
                 }
             }
         };
+
+        // 🟢 ฟังก์ชันแปลงลิงก์รูปภาพจาก Firebase ให้ยิงไปดึงรูปจาก GitHub ของคุณโดยตรง
+        function fixImgUrl(url) {
+            if (!url) return 'https://placehold.co/150?text=📦';
+            
+            // ถ้าเป็นลิงก์ที่มี [USER]/[REPO] ให้เปลี่ยนเป็นชื่อ GitHub ของคุณ
+            let cleanUrl = url.replace(/\[USER\]/g, 'rock1000000008-sketch').replace(/\[REPO\]/g, 'kmart');
+            
+            // ถ้าเป็น Path สั้นๆ ในเครื่อง ให้ต่อเป็น GitHub Raw URL
+            if (!cleanUrl.startsWith('http')) {
+                cleanUrl = `https://raw.githubusercontent.com/rock1000000008-sketch/kmart/main/${cleanUrl}`;
+            }
+            return cleanUrl;
+        }
 
         const walletNames = { 
             "office": "📝 วัสดุสำนักงาน:", "computer": "💻 วัสดุคอมพิวเตอร์:", "household": "🏠 วัสดุงานบ้านงานครัว:", 
@@ -727,7 +729,7 @@
         function syncDataFromFirebase() {
             db.ref('kmart_data').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
-                if (cloudData) {
+                if (cloudData && cloudData.divisions) {
                     personnelData = cloudData;
                 } else {
                     db.ref('kmart_data').set(personnelData);
@@ -805,7 +807,7 @@
         }
 
         function logout() { document.getElementById('login-cover-page').classList.remove('hidden'); initCoverLogin(); }
-        function getCurrentDivMaterials() { return personnelData.divisions[currentDivName].materials; }
+        function getCurrentDivMaterials() { return personnelData.divisions[currentDivName].materials || []; }
 
         function getCartCostsByType() {
             let costs = { office: 0, computer: 0, household: 0, electrical: 0, construction: 0, fuel: 0, medical: 0, agricultural: 0, other: 0 };
@@ -899,7 +901,7 @@
                 card.innerHTML = `
                     <div>
                         <div class="w-full h-36 bg-slate-50 rounded-xl mb-3 flex items-center justify-center p-2 border border-slate-100 overflow-hidden shadow-inner">
-                            <img src="${p.image_url}" onerror="this.src='https://placehold.co/150?text=📦'" class="object-cover h-full w-full rounded-lg">
+                            <img src="${fixImgUrl(p.image_url)}" onerror="this.src='https://placehold.co/150?text=📦'" class="object-cover h-full w-full rounded-lg">
                         </div>
                         <span class="text-[9px] bg-emerald-100 text-emerald-900 font-black px-2.5 py-0.5 rounded-md inline-block mb-1 shadow-sm">${walletNames[p.type] || p.type}</span>
                         <h3 class="font-extrabold text-slate-800 text-xs h-8 line-clamp-2">${p.item_name}</h3>
@@ -1009,7 +1011,7 @@
                 card.className = "flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm";
                 card.innerHTML = `
                     <div class="w-14 h-14 bg-white border rounded-xl overflow-hidden flex-shrink-0 p-1">
-                        <img src="${item.image_url}" onerror="this.src='https://placehold.co/100?text=📦'" class="w-full h-full object-cover rounded-lg">
+                        <img src="${fixImgUrl(item.image_url)}" onerror="this.src='https://placehold.co/100?text=📦'" class="w-full h-full object-cover rounded-lg">
                     </div>
                     <div class="flex-1">
                         <h4 class="font-extrabold text-slate-800 text-xs mt-0.5">${item.item_name}</h4>
@@ -1067,7 +1069,7 @@
             const previewImg = document.getElementById('store-img-preview');
             const currentMaterials = getCurrentDivMaterials();
 
-            uploadedProductImageBase64 = ""; // Reset รูปที่เลือกใหม่
+            uploadedProductImageBase64 = "";
 
             if (selectVal === "NEW_ITEM") {
                 newBox.classList.remove('hidden');
@@ -1083,7 +1085,7 @@
                     priceInput.value = item.price_unit_coin;
                     qtyInput.value = item.stock_remaining;
                     if (item.image_url) {
-                        previewImg.src = item.image_url;
+                        previewImg.src = fixImgUrl(item.image_url);
                         previewImg.classList.remove('hidden');
                     } else {
                         previewImg.src = "";
@@ -1101,13 +1103,12 @@
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
                     previewImg.classList.remove('hidden');
-                    uploadedProductImageBase64 = e.target.result; // บันทึก Base64 ของภาพใหม่
+                    uploadedProductImageBase64 = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // บันทึกแก้ไขข้อมูล หรือเพิ่มสินค้าใหม่ พร้อมอัปเดตรูปภาพ
         function saveStoreItemUpdate() {
             const selectVal = document.getElementById('admin-select-material').value;
             const newPrice = parseFloat(document.getElementById('admin-input-price').value);
@@ -1136,7 +1137,6 @@
                 if (item) {
                     item.price_unit_coin = newPrice;
                     item.stock_remaining = addQty;
-                    // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้แทนที่รูปเดิมทันที
                     if (uploadedProductImageBase64) {
                         item.image_url = uploadedProductImageBase64;
                     }
@@ -1144,13 +1144,12 @@
                 }
             }
 
-            saveCloudData(); // ซิงค์ขึ้น Firebase ทันที
+            saveCloudData();
             closeAdminStoreModal(); 
             renderProducts(); 
             uploadedProductImageBase64 = "";
         }
 
-        // ฟังก์ชันสำหรับลบสินค้าออกจากระบบ
         function deleteCurrentAdminItem() {
             const selectVal = document.getElementById('admin-select-material').value;
             if (selectVal === "NEW_ITEM") {
@@ -1165,7 +1164,7 @@
                 const itemName = currentMaterials[itemIndex].item_name;
                 if (confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบรายการพัสดุ "${itemName}" ออกจากระบบคลัง?`)) {
                     currentMaterials.splice(itemIndex, 1);
-                    saveCloudData(); // ซิงค์ข้อมูลที่ลบแล้วขึ้น Firebase ทันที
+                    saveCloudData();
                     alert(`🗑️ ลบรายการพัสดุเรียบร้อยแล้ว`);
                     closeAdminStoreModal();
                     renderProducts();
