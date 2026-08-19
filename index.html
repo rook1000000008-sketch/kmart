@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-        <!-- Firebase SDK (Realtime Database & App) -->
+    <!-- Firebase SDK (Realtime Database & App) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -571,13 +571,13 @@
     </div>
     <!-- ==================== 7. JAVASCRIPT ENGINE (FIREBASE CLOUD SYNC) ==================== -->
     <script>
-        // ตั้งค่าเชื่อมต่อ Firebase Realtime Database
         const firebaseConfig = {
             databaseURL: "https://kmart-cf668-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const BACKEND_PROXY_URL = "https://kmart-proxy-api.rook1000000008.workers.dev";
+        
         let personnelData = {
             "organization": "องค์การบริหารส่วนตำบลข่วงเปา",
             "command_period": "ประจำเดือนกรกฎาคม 2569",
@@ -601,22 +601,11 @@
                         {"name": "นางสาวนิลวรรณ ต๊ะอ๊อด", "role": "เจ้าพนักงานธุรการปฏิบัติงาน", "pin": "1234", "task": "ผู้เบิกพัสดุ"},
                         {"name": "นางสาวชฎาพร นันตาบุญ", "role": "ผู้ช่วยผู้ดูแลเด็ก", "pin": "1234", "task": "ผู้เบิกพัสดุ"}
                     ],
-                    "materials": [
-                        { "item_id": "BL-OFF-01", "item_name": "กระดาษถ่ายเอกสาร AA 80G A4 (500 แผ่น)", "price_unit_coin": 120.00, "stock_remaining": 50, "image_url": "products/paper-a4.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-02", "item_name": "ปากกาลูกลื่น ควอนดั้ม 0.5 M5 Pearl", "price_unit_coin": 10.00, "stock_remaining": 100, "image_url": "products/pen.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-03", "item_name": "ปากกาหมึกเจล Pentel 0.5", "price_unit_coin": 35.00, "stock_remaining": 40, "image_url": "products/jelpen0.5.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-04", "item_name": "กระดาษสติ๊กเกอร์ขาวด้าน A4", "price_unit_coin": 85.00, "stock_remaining": 30, "image_url": "products/sticker_a4.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-05", "item_name": "เทปลบคำผิด สเต็ดเลอร์ 5มม. x 6ม.", "price_unit_coin": 35.00, "stock_remaining": 40, "image_url": "products/StaedtlerEraser.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-09", "item_name": "เทปใส แกนใหญ่ 3/4 นิ้ว", "price_unit_coin": 18.00, "stock_remaining": 50, "image_url": "products/tape.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-11", "item_name": "ซองขาว ครุฑ (50 ซอง/มัด)", "price_unit_coin": 30.00, "stock_remaining": 30, "image_url": "products/mails.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-13", "item_name": "เครื่องคิดเลข Canon TX-121OHI III", "price_unit_coin": 390.00, "stock_remaining": 10, "image_url": "products/cal.jpg", "type": "office" },
-                        { "item_id": "BL-OFF-15", "item_name": "หลอดไฟ LED T8 18W", "price_unit_coin": 150.00, "stock_remaining": 30, "image_url": "https://placehold.co/150?text=LED+Bulb", "type": "electrical" },
-                        { "item_id": "BL-CH-03", "item_name": "ท่อ PVC 4 นิ้ว ชั้น 8.5", "price_unit_coin": 220.00, "stock_remaining": 40, "image_url": "https://placehold.co/150?text=PVC+Pipe", "type": "construction" },
-                        { "item_id": "CK-PH-01", "item_name": "หน้ากากอนามัยทางการแพทย์ (กล่อง 50 ชิ้น)", "price_unit_coin": 65.00, "stock_remaining": 50, "image_url": "https://placehold.co/150?text=Medical+Mask", "type": "medical" }
-                    ]
+                    "materials": []
                 }
             }
         };
+
         const walletNames = { 
             "office": "📝 วัสดุสำนักงาน:", "computer": "💻 วัสดุคอมพิวเตอร์:", "household": "🏠 วัสดุงานบ้านงานครัว:", 
             "electrical": "⚡ วัสดุไฟฟ้าและวิทยุ:", "construction": "🏗️ วัสดุก่อสร้าง:", "fuel": "⛽ วัสดุเชื้อเพลิงและหล่อลื่น:", 
@@ -629,6 +618,35 @@
         let currentUser = {}; let currentDivName = ""; let cart = {};
         let enteredPin = ""; let activeCategory = "all";
         let uploadedProductImageBase64 = "";
+
+        // 🟢 ฟังก์ชันใหม่: ดึงข้อมูลพัสดุภาษาไทยจาก products_data.json อัตโนมัติ
+        async function loadProductsFromGithubJSON() {
+            try {
+                const response = await fetch('products_data.json');
+                if (!response.ok) return;
+                
+                const jsonData = await response.json();
+                
+                // แปลงข้อมูลให้อยู่ในรูปแบบที่ระบบ K-MART ใช้งาน
+                const dynamicMaterials = jsonData.map((item, idx) => ({
+                    "item_id": item.image_filename ? item.image_filename.split('.')[0].toUpperCase() : `ITEM-${idx+1}`,
+                    "item_name": item.name_th,             // ชื่อภาษาไทยสำหรับโชว์ในแอป
+                    "price_unit_coin": 100.00,              // ราคาเริ่มต้น
+                    "stock_remaining": 50,                  // สต็อกเริ่มต้น
+                    "image_url": item.image_url,            // รูปภาพดึงจาก GitHub
+                    "type": "office"                        // หมวดหมู่เริ่มต้น
+                }));
+
+                if (dynamicMaterials.length > 0) {
+                    personnelData.divisions["งานพัสดุและเบิกจ่ายกลาง"].materials = dynamicMaterials;
+                    saveCloudData(); // บันทึกลง Firebase
+                    console.log("✅ โหลดข้อมูลพัสดุภาษาไทยสำเร็จ!");
+                }
+            } catch (e) {
+                console.log("ใช้อ่านข้อมูลพัสดุเดิมจากระบบ");
+            }
+        }
+
         function syncDataFromFirebase() {
             db.ref('kmart_data').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
@@ -1207,8 +1225,13 @@
                 updateBudgetDisplay(); updateCartUI(); renderCategories(); renderProducts();
             }, 350);
         }
-        syncDataFromFirebase();
-        initCoverLogin();
+
+        // เริ่มการทำงานระบบ
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductsFromGithubJSON();
+            syncDataFromFirebase();
+            initCoverLogin();
+        });
     </script>
 </body>
 </html>
